@@ -121,13 +121,10 @@ public class MainActivity extends Activity {
                 //canvas.drawText("Lives: ", 10, screenHeight-50, paint);
 
                 //draw the minotaur
-                Rect destRect = new Rect(screenWidth / 2 - 100,
-                        screenHeight / 2 - 100, screenWidth / 2 + 100,
-                        screenHeight / 2 + 100);
+                Rect destRect = new Rect(screenWidth / 2 - 200,
+                        screenHeight / 2 - 200, screenWidth / 2 + 200,
+                        screenHeight / 2 + 200);
 
-                //trying to scale image size
-                //playerWalkAnimBitmap.getScaledHeight(2);
-                //playerWalkAnimBitmap.getScaledWidth(2);
 
                 canvas.drawBitmap(playerWalkAnimBitmap,
                         rectToBeDrawn, destRect, paint);
@@ -139,7 +136,8 @@ public class MainActivity extends Activity {
         public void controlFPS() {
             long timeThisFrame = (System.currentTimeMillis() -
                     lastFrameTime);
-            long timeToSleep = 500 - timeThisFrame;
+            //this controls the speed of the sprite
+            long timeToSleep = 50 - timeThisFrame;
             if (timeThisFrame > 0) {
                 fps = (int) (1000 / timeThisFrame);
             }
