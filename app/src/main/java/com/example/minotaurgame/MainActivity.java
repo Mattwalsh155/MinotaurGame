@@ -27,6 +27,19 @@ public class MainActivity extends Activity {
 
     //the player sprite sheet
     Bitmap playerWalkAnimBitmap;
+    Bitmap playerJumpAnimBitmap;
+    Bitmap playerAttackAnimBitmap;
+    Bitmap playerSlideAnimBitmap;
+
+    //Enemy sprite sheets
+    Bitmap ghostAnimBitmap;
+    Bitmap wolfAnimBitmap;
+    Bitmap ratAnimBitmap;
+
+    //image buttons
+    Bitmap jumpButtonBitmap;
+    Bitmap attackButtonBitmap;
+    Bitmap slideButtonBitmap;
 
     Rect rectToBeDrawn;
 
@@ -41,7 +54,7 @@ public class MainActivity extends Activity {
 
     //stats
     int score = 0;
-    int lives = 3;
+    //int lives = 3; One hit kill, no lives
     int fps;
     long lastFrameTime;
 
@@ -67,6 +80,7 @@ public class MainActivity extends Activity {
         minotaurAnimView = new MinotaurAnimView(this);
 
         setContentView(minotaurAnimView);
+        //setContentView(R.layout.activity_main);
 
         //i = new Intent(this, GameActivity.class);
     }
@@ -76,6 +90,7 @@ public class MainActivity extends Activity {
         SurfaceHolder ourHolder;
         volatile boolean playingGame;
         Paint paint;
+
 
         public MinotaurAnimView(Context context) {
             super(context);
