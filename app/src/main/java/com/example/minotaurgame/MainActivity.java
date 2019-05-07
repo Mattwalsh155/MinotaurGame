@@ -115,15 +115,15 @@ public class MainActivity extends Activity {
                 canvas = ourHolder.lockCanvas();
                 canvas.drawColor(Color.BLACK);
                 paint.setColor(Color.argb(255, 255, 255, 255));
-                paint.setTextSize(250);
+                paint.setTextSize(50);
                 //canvas.drawText("Minotaur Game", 10, 150, paint);
                 //paint.setTextSize(25);
-                //canvas.drawText("Lives: ", 10, screenHeight-50, paint);
+                canvas.drawText("Score: ", 10, 50, paint);
 
                 //draw the minotaur
-                Rect destRect = new Rect(screenWidth / 2 - 200,
-                        screenHeight / 2 - 200, screenWidth / 2 + 200,
-                        screenHeight / 2 + 200);
+                Rect destRect = new Rect(screenWidth / 2 - 250,
+                        screenHeight / 2 - 250, screenWidth / 2 + 250,
+                        screenHeight / 2 + 250);
 
 
                 canvas.drawBitmap(playerWalkAnimBitmap,
