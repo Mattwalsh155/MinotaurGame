@@ -16,6 +16,10 @@
     <item android:drawable="@drawable/minotaur_death_07"
         android:duration="100"></item>
     <item android:drawable="@drawable/minotaur_death_08"
+    android:duration="100"></item>
+    <item android:drawable="@drawable/minotaur_death_09"
+        android:duration="100"></item>
+    <item android:drawable="@drawable/minotaur_death_10"
         android:duration="100"></item>
 
 </animation-list>

@@ -2,6 +2,8 @@ package com.example.minotaurgame;
 
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.Window;
@@ -18,6 +20,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     AnimationDrawable attackingMinotaur;
     AnimationDrawable slidingMinotaur;
     AnimationDrawable jumpingMinotaur;
+    private Handler myHandler;
+    private int animation = 0;
+    private boolean buttonPressed = true;
+    private int loopTime = 900;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,18 +47,72 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         Button2.setOnClickListener(this);
         Button3.setOnClickListener(this);
 
+
+        if(buttonPressed){
+            myHandler = new Handler() {
+                public void handleMessage(Message msg) {
+                    super.handleMessage(msg);
+
+                    switch(animation){
+                        case 0:
+                            ImageView minotaurWalk = (ImageView)findViewById(R.id.playerWalkAnim);
+                            minotaurWalk.setImageResource(R.drawable.runningminotaur);
+                            runningMinotaur = (AnimationDrawable)minotaurWalk.getDrawable();
+                            runningMinotaur.start();
+                            loopTime = 900;
+                            break;
+
+                        case 1:
+                            ImageView minotaurAttack = (ImageView) findViewById(R.id.playerWalkAnim);
+                            minotaurAttack.setImageResource(R.drawable.attackingminotaur);
+                            attackingMinotaur = (AnimationDrawable) minotaurAttack.getDrawable();
+                            attackingMinotaur.start();
+                            loopTime = 1600;
+                            break;
+
+                        case 2:
+                            ImageView minotaurSlide = (ImageView) findViewById(R.id.playerWalkAnim);
+                            minotaurSlide.setImageResource(R.drawable.slidingminotaur);
+                            slidingMinotaur = (AnimationDrawable) minotaurSlide.getDrawable();
+                            slidingMinotaur.start();
+                            loopTime = 1000;
+                            break;
+
+                        default:
+                            minotaurWalk = (ImageView)findViewById(R.id.playerWalkAnim);
+                            minotaurWalk.setImageResource(R.drawable.runningminotaur);
+                            runningMinotaur = (AnimationDrawable)minotaurWalk.getDrawable();
+                            runningMinotaur.start();
+                            loopTime = 900;
+                            break;
+
+                    }
+
+
+                    animation = 0;
+
+                    myHandler.sendEmptyMessageDelayed(0, loopTime);
+                    buttonPressed = false;
+                }
+            };
+            myHandler.sendEmptyMessage(0);
+        }
+
+
     }
 
     @Override
     public void onClick(View v) {
 
+
         switch (v.getId()) {
             case R.id.attackButton:
-                ImageView minotaurAttack = (ImageView) findViewById(R.id.playerWalkAnim);
-                minotaurAttack.setImageResource(R.drawable.attackingminotaur);
-                attackingMinotaur = (AnimationDrawable) minotaurAttack.getDrawable();
-                attackingMinotaur.start();
-
+//                ImageView minotaurAttack = (ImageView) findViewById(R.id.playerWalkAnim);
+//                minotaurAttack.setImageResource(R.drawable.attackingminotaur);
+//                attackingMinotaur = (AnimationDrawable) minotaurAttack.getDrawable();
+//                attackingMinotaur.start();
+                buttonPressed = true;
+                animation = 1;
                 break;
 
             case R.id.jumpButton:
@@ -60,18 +120,22 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.slideButton:
-                ImageView minotaurSlide = (ImageView) findViewById(R.id.playerWalkAnim);
-                minotaurSlide.setImageResource(R.drawable.slidingminotaur);
-                slidingMinotaur = (AnimationDrawable) minotaurSlide.getDrawable();
-                slidingMinotaur.start();
+//                ImageView minotaurSlide = (ImageView) findViewById(R.id.playerWalkAnim);
+//                minotaurSlide.setImageResource(R.drawable.slidingminotaur);
+//                slidingMinotaur = (AnimationDrawable) minotaurSlide.getDrawable();
+//                slidingMinotaur.start();
+                animation = 2;
+                buttonPressed = true;
 
                 break;
 
             default:
-                ImageView minotaurWalk = (ImageView)findViewById(R.id.playerWalkAnim);
-                minotaurWalk.setImageResource(R.drawable.runningminotaur);
-                runningMinotaur = (AnimationDrawable)minotaurWalk.getDrawable();
-                runningMinotaur.start();
+//                ImageView minotaurWalk = (ImageView)findViewById(R.id.playerWalkAnim);
+//                minotaurWalk.setImageResource(R.drawable.runningminotaur);
+//                runningMinotaur = (AnimationDrawable)minotaurWalk.getDrawable();
+//                runningMinotaur.start();
+                animation = 0;
+                buttonPressed = true;
 
                 break;
         }
