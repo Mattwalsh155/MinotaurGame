@@ -1,64 +1,15 @@
 package com.example.minotaurgame;
 
 import android.app.Activity;
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Point;
-import android.graphics.Rect;
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.Display;
-import android.view.KeyEvent;
-import android.view.MotionEvent;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements View.OnClickListener {
 
-    Canvas canvas;
-
-    MinotaurAnimView minotaurAnimView;
-
-    //the player sprite sheet
-    Bitmap playerWalkAnimBitmap;
-    Bitmap playerJumpAnimBitmap;
-    Bitmap playerAttackAnimBitmap;
-    Bitmap playerSlideAnimBitmap;
-
-    //Enemy sprite sheets
-    Bitmap ghostAnimBitmap;
-    Bitmap wolfAnimBitmap;
-    Bitmap ratAnimBitmap;
-
-    //image buttons
-    Bitmap jumpButtonBitmap;
-    Bitmap attackButtonBitmap;
-    Bitmap slideButtonBitmap;
-
-    Rect rectToBeDrawn;
-
-    //frame dimensions
-    int frameHeight = 92;
-    int frameWidth = 256;
-    int numFrames = 8;
-    int frameNumber;
-
-    int screenWidth;
-    int screenHeight;
-
-    //stats
-    int score = 0;
-    //int lives = 3; One hit kill, no lives
-    int fps;
-    long lastFrameTime;
-
-    //Intent i;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,160 +18,18 @@ public class MainActivity extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        //find out the width and height of the screen
-        Display display = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        screenWidth = size.x;
-        screenHeight = size.y;
+        setContentView(R.layout.activity_main);
 
-        playerWalkAnimBitmap =
-                BitmapFactory.decodeResource(getResources(), R.drawable.minotaur_walk);
+        Button playButton = (Button)findViewById(R.id.playButton);
 
-        minotaurAnimView = new MinotaurAnimView(this);
-
-        setContentView(minotaurAnimView);
-        //setContentView(R.layout.activity_main);
-
-        //i = new Intent(this, GameActivity.class);
-    }
-
-    class MinotaurAnimView extends SurfaceView implements Runnable {
-        Thread ourThread = null;
-        SurfaceHolder ourHolder;
-        volatile boolean playingGame;
-        Paint paint;
-
-
-        public MinotaurAnimView(Context context) {
-            super(context);
-            ourHolder = getHolder();
-            paint = new Paint();
-            frameWidth = playerWalkAnimBitmap.getWidth() / numFrames;
-            frameHeight = playerWalkAnimBitmap.getHeight();
-        }
-
-        @Override
-        public void run() {
-            while (playingGame) {
-                update();
-                draw();
-                controlFPS();
-            }
-        }
-
-        public void update() {
-
-            //which frame should be drawn
-            rectToBeDrawn = new Rect((frameNumber * frameWidth) - 1,
-                    0, (frameNumber * frameWidth + frameWidth) - 1, frameHeight);
-
-            //now go to next frame
-            frameNumber++;
-
-            //reset back to first frame when we reach the last frame
-            if (frameNumber == numFrames) {
-                frameNumber = 0;
-            }
-        }
-
-        public void draw() {
-
-            if (ourHolder.getSurface().isValid()) {
-                canvas = ourHolder.lockCanvas();
-                canvas.drawColor(Color.BLACK);
-                paint.setColor(Color.argb(255, 255, 255, 255));
-                paint.setTextSize(50);
-                //canvas.drawText("Minotaur Game", 10, 150, paint);
-                //paint.setTextSize(25);
-                canvas.drawText("Score: ", 10, 50, paint);
-
-                //draw the minotaur
-                Rect destRect = new Rect(screenWidth / 2 - 250,
-                        screenHeight / 2 - 250, screenWidth / 2 + 250,
-                        screenHeight / 2 + 250);
-
-
-                canvas.drawBitmap(playerWalkAnimBitmap,
-                        rectToBeDrawn, destRect, paint);
-
-                ourHolder.unlockCanvasAndPost(canvas);
-            }
-        }
-
-        public void controlFPS() {
-            long timeThisFrame = (System.currentTimeMillis() -
-                    lastFrameTime);
-            //this controls the speed of the sprite
-            long timeToSleep = 50 - timeThisFrame;
-            if (timeThisFrame > 0) {
-                fps = (int) (1000 / timeThisFrame);
-            }
-            if (timeToSleep > 0) {
-
-                try {
-                    ourThread.sleep(timeToSleep);
-                } catch (InterruptedException e) {
-
-                }
-            }
-
-            lastFrameTime = System.currentTimeMillis();
-
-        }
-
-        public void pause() {
-            playingGame = false;
-            try {
-                ourThread.join();
-            } catch (InterruptedException e) {
-            }
-        }
-
-        public void resume() {
-            playingGame = true;
-            ourThread = new Thread(this);
-            ourThread.start();
-        }
-
-        @Override
-        public boolean onTouchEvent (MotionEvent motionEvent) {
-            //startActivity(i);
-            return true;
-        }
+        playButton.setOnClickListener(this);
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-
-        while (true) {
-            minotaurAnimView.pause();
-            break;
-        }
-
-        finish();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        minotaurAnimView.resume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        minotaurAnimView.pause();
-    }
-
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            minotaurAnimView.pause();
-            finish();
-            return true;
-        }
-        return false;
+    public void onClick(View v) {
+        Intent i;
+        i = new Intent(this, GameActivity.class);
+        startActivity(i);
     }
 
     @Override
