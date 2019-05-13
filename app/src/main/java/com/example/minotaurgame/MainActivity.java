@@ -1,52 +1,16 @@
 package com.example.minotaurgame;
 
 import android.app.Activity;
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Point;
-import android.graphics.Rect;
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.Display;
-import android.view.KeyEvent;
-import android.view.MotionEvent;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.Button;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements View.OnClickListener {
 
-    Canvas canvas;
-
-    MinotaurAnimView minotaurAnimView;
-
-    //the player sprite sheet
-    Bitmap playerWalkAnimBitmap;
-
-    Rect rectToBeDrawn;
-
-    //frame dimensions
-    int frameHeight = 92;
-    int frameWidth = 256;
-    int numFrames = 8;
-    int frameNumber;
-
-    int screenWidth;
-    int screenHeight;
-
-    //stats
-    int score = 0;
-    int lives = 3;
-    int fps;
-    long lastFrameTime;
-
-    //Intent i;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,15 +19,9 @@ public class MainActivity extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        //find out the width and height of the screen
-        Display display = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        screenWidth = size.x;
-        screenHeight = size.y;
+        setContentView(R.layout.activity_main);
 
-        playerWalkAnimBitmap =
-                BitmapFactory.decodeResource(getResources(), R.drawable.minotaur_walk);
+        Button playButton = (Button)findViewById(R.id.playButton);
 
         minotaurAnimView = new MinotaurAnimView(this);
 
@@ -180,39 +138,16 @@ public class MainActivity extends Activity {
             //startActivity(i);
             return true;
         }
+
+        playButton.setOnClickListener(this);
+
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-
-        while (true) {
-            minotaurAnimView.pause();
-            break;
-        }
-
-        finish();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        minotaurAnimView.resume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        minotaurAnimView.pause();
-    }
-
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            minotaurAnimView.pause();
-            finish();
-            return true;
-        }
-        return false;
+    public void onClick(View v) {
+        Intent i;
+        i = new Intent(this, GameActivity.class);
+        startActivity(i);
     }
 
     @Override
