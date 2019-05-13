@@ -18,6 +18,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageView;
 
 public class MainActivity extends Activity {
 
@@ -67,6 +68,7 @@ public class MainActivity extends Activity {
         minotaurAnimView = new MinotaurAnimView(this);
 
         setContentView(minotaurAnimView);
+        setContentView(R.layout.activity_game);
 
         //i = new Intent(this, GameActivity.class);
     }
@@ -91,10 +93,15 @@ public class MainActivity extends Activity {
                 update();
                 draw();
                 controlFPS();
+                //background();
             }
         }
 
+
+
+
         public void update() {
+
 
             //which frame should be drawn
             rectToBeDrawn = new Rect((frameNumber * frameWidth) - 1,
