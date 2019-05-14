@@ -102,7 +102,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                             jumpingMinotaur = (AnimationDrawable) minotaurJump.getDrawable();
                             jumpingMinotaur.start();
                             loopTime = 800;
-                            moveAnimation();
+                            moveAnimationUp();
+
                             break;
 
                         default:
@@ -126,14 +127,22 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    public void moveAnimation() {
-        Animation img = new TranslateAnimation(Animation.ABSOLUTE, Animation.ABSOLUTE, Animation.ABSOLUTE, -250);
-        img.setDuration(900);
-        img.setFillAfter(true);
+    public void moveAnimationUp() {
+        Animation img = new TranslateAnimation(Animation.ABSOLUTE, Animation.ABSOLUTE, 0, -300);
+        img.setDuration(800);
+
 
         minotaurJump.startAnimation(img);
 
+        moveAnimationDown();
+    }
 
+    public void moveAnimationDown() {
+        Animation img = new TranslateAnimation(Animation.ABSOLUTE, Animation.ABSOLUTE, -300, 0);
+        img.setDuration(800);
+
+
+        minotaurJump.startAnimation(img);
     }
 
     @Override
