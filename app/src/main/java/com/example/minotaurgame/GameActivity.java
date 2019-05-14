@@ -11,12 +11,16 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.animation.LinearInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
+import android.widget.Button;
 import android.widget.ImageView;
 import java.util.Random;
 import android.widget.Button;
 
 
+
+import java.util.Timer;
 
 public class GameActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -27,71 +31,17 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     AnimationDrawable attackingMinotaur;
     AnimationDrawable slidingMinotaur;
     AnimationDrawable jumpingMinotaur;
+    ImageView minotaurWalk;
+    ImageView minotaurJump;
+    ImageView minotaurAttack;
+    ImageView minotaurSlide;
     private Handler myHandler;
     private int animation = 0;
     private boolean buttonPressed = true;
     private int loopTime = 900;
 
-    volatile boolean playingGame;
-
-    // ImageView backgroundOne =  findViewById(R.id.castle1);
-    // ImageView backgroundTwo =  findViewById(R.id.castle2);
-
-
-
-/*
-   public class background1 {
-
-        private int x, y;
-        private int speed;
-
-        private int maxX;
-        private int maxY;
-        private int minX;
-        private int minY;
-
-        //constructor
-        public background1(int screenX, int screenY){
-
-
-
-            maxX = screenX;
-            maxY = screenY;
-            minX = 0;
-            minY = 0;
-
-            //Set speed between 0-9
-            Random generator = new Random();
-            speed = generator.nextInt(10);
-
-            //set coordinates
-            x = generator.nextInt(maxX);
-            y = generator.nextInt(maxY);
-        }
-*/
-
-
-
-        /*public void update(int playerSpeed){
-            x -= playerSpeed;
-            x -= speed;
-            //background1.setTranslationX(1.0f);
-
-            //respawn background
-            if(x < 0){
-                x = maxX;
-                Random generator = new Random();
-                y = generator.nextInt(15);
-            }
-        }*/
-        //getters & setters
-      //  public int getX(){
-         //   return x;
-       // }
-       // public int getY(){
-         //   return y;
-        //}
-    //}
+    private float jumpXVelocity;
+    private Timer timer = new Timer();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,7 +52,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
         setContentView(R.layout.activity_game);
 
-        ImageView minotaurWalk = (ImageView)findViewById(R.id.playerWalkAnim);
+        minotaurWalk = (ImageView)findViewById(R.id.playerWalkAnim);
         minotaurWalk.setImageResource(R.drawable.runningminotaur);
         runningMinotaur = (AnimationDrawable)minotaurWalk.getDrawable();
         runningMinotaur.start();
@@ -123,7 +73,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
                     switch(animation){
                         case 0:
-                            ImageView minotaurWalk = (ImageView)findViewById(R.id.playerWalkAnim);
+                            minotaurWalk = (ImageView)findViewById(R.id.playerWalkAnim);
                             minotaurWalk.setImageResource(R.drawable.runningminotaur);
                             runningMinotaur = (AnimationDrawable)minotaurWalk.getDrawable();
                             runningMinotaur.start();
@@ -131,7 +81,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                             break;
 
                         case 1:
-                            ImageView minotaurAttack = (ImageView) findViewById(R.id.playerWalkAnim);
+                            minotaurAttack = (ImageView) findViewById(R.id.playerWalkAnim);
                             minotaurAttack.setImageResource(R.drawable.attackingminotaur);
                             attackingMinotaur = (AnimationDrawable) minotaurAttack.getDrawable();
                             attackingMinotaur.start();
@@ -139,11 +89,20 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                             break;
 
                         case 2:
-                            ImageView minotaurSlide = (ImageView) findViewById(R.id.playerWalkAnim);
+                            minotaurSlide = (ImageView) findViewById(R.id.playerWalkAnim);
                             minotaurSlide.setImageResource(R.drawable.slidingminotaur);
                             slidingMinotaur = (AnimationDrawable) minotaurSlide.getDrawable();
                             slidingMinotaur.start();
-                            loopTime = 1000;
+                            loopTime = 600;
+                            break;
+
+                        case 3:
+                            minotaurJump = (ImageView) findViewById(R.id.playerWalkAnim);
+                            minotaurJump.setImageResource(R.drawable.jumpingminotaur);
+                            jumpingMinotaur = (AnimationDrawable) minotaurJump.getDrawable();
+                            jumpingMinotaur.start();
+                            loopTime = 800;
+                            moveAnimation();
                             break;
 
                         default:
@@ -165,6 +124,14 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             };
             myHandler.sendEmptyMessage(0);
         }
+    }
+
+    public void moveAnimation() {
+        Animation img = new TranslateAnimation(Animation.ABSOLUTE, Animation.ABSOLUTE, Animation.ABSOLUTE, -250);
+        img.setDuration(900);
+        img.setFillAfter(true);
+
+        minotaurJump.startAnimation(img);
 
 
     }
@@ -184,6 +151,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.jumpButton:
+                buttonPressed = true;
+                animation = 3;
+                //moveAnimation();
 
                 break;
 
