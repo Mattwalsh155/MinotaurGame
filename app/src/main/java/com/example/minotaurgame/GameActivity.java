@@ -11,6 +11,8 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import java.util.Timer;
+
 public class GameActivity extends AppCompatActivity implements View.OnClickListener{
 
     Button Button1;
@@ -24,6 +26,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private int animation = 0;
     private boolean buttonPressed = true;
     private int loopTime = 900;
+
+    private float jumpXVelocity;
+    private Timer timer = new Timer();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +80,15 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                             minotaurSlide.setImageResource(R.drawable.slidingminotaur);
                             slidingMinotaur = (AnimationDrawable) minotaurSlide.getDrawable();
                             slidingMinotaur.start();
-                            loopTime = 1000;
+                            loopTime = 600;
+                            break;
+
+                        case 3:
+                            ImageView minotaurJump = (ImageView) findViewById(R.id.playerWalkAnim);
+                            minotaurJump.setImageResource(R.drawable.jumpingminotaur);
+                            jumpingMinotaur = (AnimationDrawable) minotaurJump.getDrawable();
+                            jumpingMinotaur.start();
+                            loopTime = 800;
                             break;
 
                         default:
@@ -116,6 +129,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.jumpButton:
+                buttonPressed = true;
+                animation = 3;
 
                 break;
 
