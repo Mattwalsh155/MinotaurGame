@@ -8,6 +8,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
 
@@ -22,6 +24,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     AnimationDrawable attackingMinotaur;
     AnimationDrawable slidingMinotaur;
     AnimationDrawable jumpingMinotaur;
+    ImageView minotaurWalk;
+    ImageView minotaurJump;
+    ImageView minotaurAttack;
+    ImageView minotaurSlide;
     private Handler myHandler;
     private int animation = 0;
     private boolean buttonPressed = true;
@@ -39,7 +45,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
         setContentView(R.layout.activity_game);
 
-        ImageView minotaurWalk = (ImageView)findViewById(R.id.playerWalkAnim);
+        minotaurWalk = (ImageView)findViewById(R.id.playerWalkAnim);
         minotaurWalk.setImageResource(R.drawable.runningminotaur);
         runningMinotaur = (AnimationDrawable)minotaurWalk.getDrawable();
         runningMinotaur.start();
@@ -60,7 +66,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
                     switch(animation){
                         case 0:
-                            ImageView minotaurWalk = (ImageView)findViewById(R.id.playerWalkAnim);
+                            minotaurWalk = (ImageView)findViewById(R.id.playerWalkAnim);
                             minotaurWalk.setImageResource(R.drawable.runningminotaur);
                             runningMinotaur = (AnimationDrawable)minotaurWalk.getDrawable();
                             runningMinotaur.start();
@@ -68,7 +74,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                             break;
 
                         case 1:
-                            ImageView minotaurAttack = (ImageView) findViewById(R.id.playerWalkAnim);
+                            minotaurAttack = (ImageView) findViewById(R.id.playerWalkAnim);
                             minotaurAttack.setImageResource(R.drawable.attackingminotaur);
                             attackingMinotaur = (AnimationDrawable) minotaurAttack.getDrawable();
                             attackingMinotaur.start();
@@ -76,7 +82,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                             break;
 
                         case 2:
-                            ImageView minotaurSlide = (ImageView) findViewById(R.id.playerWalkAnim);
+                            minotaurSlide = (ImageView) findViewById(R.id.playerWalkAnim);
                             minotaurSlide.setImageResource(R.drawable.slidingminotaur);
                             slidingMinotaur = (AnimationDrawable) minotaurSlide.getDrawable();
                             slidingMinotaur.start();
@@ -84,11 +90,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                             break;
 
                         case 3:
-                            ImageView minotaurJump = (ImageView) findViewById(R.id.playerWalkAnim);
+                            minotaurJump = (ImageView) findViewById(R.id.playerWalkAnim);
                             minotaurJump.setImageResource(R.drawable.jumpingminotaur);
                             jumpingMinotaur = (AnimationDrawable) minotaurJump.getDrawable();
                             jumpingMinotaur.start();
                             loopTime = 800;
+                            moveAnimation();
                             break;
 
                         default:
@@ -110,6 +117,14 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             };
             myHandler.sendEmptyMessage(0);
         }
+    }
+
+    public void moveAnimation() {
+        Animation img = new TranslateAnimation(Animation.ABSOLUTE, Animation.ABSOLUTE, Animation.ABSOLUTE, -250);
+        img.setDuration(900);
+        img.setFillAfter(true);
+
+        minotaurJump.startAnimation(img);
 
 
     }
@@ -131,6 +146,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.jumpButton:
                 buttonPressed = true;
                 animation = 3;
+                //moveAnimation();
 
                 break;
 
