@@ -96,6 +96,18 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                             jumpingMinotaur.start();
                             loopTime = 800;
                             moveAnimationUp();
+                            //moveAnimationDown();
+
+                            break;
+
+                        case 4:
+                            minotaurJump = (ImageView) findViewById(R.id.playerWalkAnim);
+                            minotaurJump.setImageResource(R.drawable.jumpingminotaur);
+                            jumpingMinotaur = (AnimationDrawable) minotaurJump.getDrawable();
+                            jumpingMinotaur.start();
+                            loopTime = 800;
+                            //moveAnimationUp();
+                            moveAnimationDown();
 
                             break;
 
@@ -109,8 +121,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
                     }
 
+                    if(animation == 3){
+                        animation = 4;
+                    } else {
+                        animation = 0;
+                    }
 
-                    animation = 0;
 
                     myHandler.sendEmptyMessageDelayed(0, loopTime);
                     buttonPressed = false;
@@ -126,8 +142,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
 
         minotaurJump.startAnimation(img);
-
-        moveAnimationDown();
+        //myHandler.sendEmptyMessageDelayed(0, 800);
+        //moveAnimationDown();
     }
 
     public void moveAnimationDown() {
