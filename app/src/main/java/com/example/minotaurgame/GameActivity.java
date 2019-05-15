@@ -24,10 +24,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     AnimationDrawable attackingMinotaur;
     AnimationDrawable slidingMinotaur;
     AnimationDrawable jumpingMinotaur;
+    AnimationDrawable fallingMinotaur;
     ImageView minotaurWalk;
     ImageView minotaurJump;
     ImageView minotaurAttack;
     ImageView minotaurSlide;
+    ImageView minotaurFall;
     private Handler myHandler;
     private int animation = 0;
     private boolean buttonPressed = true;
@@ -101,10 +103,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                             break;
 
                         case 4:
-                            minotaurJump = (ImageView) findViewById(R.id.playerWalkAnim);
-                            minotaurJump.setImageResource(R.drawable.jumpingminotaur);
-                            jumpingMinotaur = (AnimationDrawable) minotaurJump.getDrawable();
-                            jumpingMinotaur.start();
+                            minotaurFall = (ImageView) findViewById(R.id.playerWalkAnim);
+                            minotaurFall.setImageResource(R.drawable.fallingminotaur);
+                            fallingMinotaur = (AnimationDrawable) minotaurFall.getDrawable();
+                            fallingMinotaur.start();
                             loopTime = 800;
                             //moveAnimationUp();
                             moveAnimationDown();
