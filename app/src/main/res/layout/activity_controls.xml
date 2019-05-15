@@ -138,4 +138,28 @@
         app:layout_constraintStart_toStartOf="parent"
         tools:layout_editor_absoluteY="184dp" />
 
+    <ImageView
+        android:id="@+id/imageView5"
+        android:layout_width="154dp"
+        android:layout_height="134dp"
+        app:srcCompat="@drawable/ratcontrol"
+        tools:layout_editor_absoluteX="45dp"
+        tools:layout_editor_absoluteY="170dp" />
+
+    <ImageView
+        android:id="@+id/imageView6"
+        android:layout_width="113dp"
+        android:layout_height="78dp"
+        app:srcCompat="@drawable/woldcontrol"
+        tools:layout_editor_absoluteX="209dp"
+        tools:layout_editor_absoluteY="226dp" />
+
+    <ImageView
+        android:id="@+id/imageView7"
+        android:layout_width="100dp"
+        android:layout_height="77dp"
+        app:srcCompat="@drawable/ghostcontrol"
+        tools:layout_editor_absoluteX="357dp"
+        tools:layout_editor_absoluteY="226dp" />
+
 </android.support.constraint.ConstraintLayout>
