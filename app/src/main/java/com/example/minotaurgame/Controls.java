@@ -10,8 +10,9 @@ public class Controls extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_controls);
+
+        Button Back = (Button) findViewById(R.id.Back);
+        setContentView(R.layout.activity_main);
     }
-
-
 
 }
