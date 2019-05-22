@@ -48,6 +48,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/minotaur_walk_01" />
 
+
     <com.q42.android.scrollingimageview.ScrollingImageView
         android:id="@+id/scrolling_background"
         android:layout_width="match_parent"

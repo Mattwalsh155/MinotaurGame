@@ -1,6 +1,10 @@
 package com.example.minotaurgame;
 
+import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
 import android.graphics.drawable.AnimationDrawable;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -12,7 +16,9 @@ import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.media.MediaPlayer;
 
+import java.io.IOException;
 import java.util.Timer;
 
 public class GameActivity extends AppCompatActivity implements View.OnClickListener{
@@ -35,6 +41,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private boolean buttonPressed = true;
     private int loopTime = 900;
 
+    MediaPlayer music;
+
+    private SoundPool soundPool;
+    int jump = -1;
+    int slide = -1;
+    int attack = -1;
+
     private float jumpXVelocity;
     private Timer timer = new Timer();
 
@@ -44,6 +57,23 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC,0);
+        try{
+            AssetManager assetManager = getAssets();
+            AssetFileDescriptor descriptor;
+
+            descriptor = assetManager.openFd("jump.wav");
+            jump = soundPool.load(descriptor, 0);
+
+            descriptor = assetManager.openFd("hit.wav");
+            attack = soundPool.load(descriptor, 0);
+
+            descriptor = assetManager.openFd("slide.wav");
+            slide = soundPool.load(descriptor, 0);
+        }catch (IOException e){}
+
+        music();
 
         setContentView(R.layout.activity_game);
 
@@ -138,6 +168,26 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    public void music(){
+        if(music == null){
+            music = MediaPlayer.create(this,R.raw.soundtrack);
+            if(music != null){
+                music = MediaPlayer.create(this,R.raw.soundtrack2);
+                music.setLooping(true);
+            }
+        }
+        music.start();
+    }
+
+
+
+
+
+    public void time(){
+
+    }
+
+
     public void moveAnimationUp() {
         Animation img = new TranslateAnimation(Animation.ABSOLUTE, Animation.ABSOLUTE, 0, -300);
         img.setDuration(800);
@@ -168,11 +218,14 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 //                attackingMinotaur.start();
                 buttonPressed = true;
                 animation = 1;
+                soundPool.play(attack, 1, 1, 0, 0, 1);
+
                 break;
 
             case R.id.jumpButton:
                 buttonPressed = true;
                 animation = 3;
+                soundPool.play(jump, 1, 1, 0, 0, 1);
                 //moveAnimation();
 
                 break;
@@ -182,8 +235,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 //                minotaurSlide.setImageResource(R.drawable.slidingminotaur);
 //                slidingMinotaur = (AnimationDrawable) minotaurSlide.getDrawable();
 //                slidingMinotaur.start();
-                animation = 2;
                 buttonPressed = true;
+                animation = 2;
+                soundPool.play(slide, 1, 1, 0, 0, 1);
+
 
                 break;
 
