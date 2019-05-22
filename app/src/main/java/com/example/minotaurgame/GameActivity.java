@@ -1,5 +1,7 @@
 package com.example.minotaurgame;
 
+import android.content.SharedPreferences;
+import android.graphics.Rect;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,12 +15,13 @@ import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.q42.android.scrollingimageview.ScrollingImageView;
 
 import java.util.Timer;
 
-public class GameActivity extends AppCompatActivity implements View.OnClickListener{
+public class GameActivity extends AppCompatActivity implements View.OnClickListener {
 
     Button Button1;
     Button Button2;
@@ -26,8 +29,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     Button pauseButton;
     //
     AnimationDrawable minotaurState;
+    AnimationDrawable wolfState;
     //
     ImageView minotaurImageView;
+    ImageView wolfImageView;
     //
     TextView scoreText;
     TextView levelText;
@@ -58,6 +63,15 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     Thread ourThread = null;
     volatile boolean playingGame;
 
+    private Rect rectPlayer;
+
+    SharedPreferences prefs;
+    SharedPreferences.Editor editor;
+    String dataName = "MyData";
+    String intName = "MyInt";
+    int defaultInt = 0;
+    int hiScore;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,10 +81,20 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
         setContentView(R.layout.activity_game);
 
+        prefs = getSharedPreferences(dataName, MODE_PRIVATE);
+        editor = prefs.edit();
+        hiScore = prefs.getInt(intName, defaultInt);
+
         minotaurImageView = (ImageView)findViewById(R.id.playerWalkAnim);
         minotaurImageView.setImageResource(R.drawable.runningminotaur);
         minotaurState = (AnimationDrawable)minotaurImageView.getDrawable();
         minotaurState.start();
+
+        wolfImageView = findViewById(R.id.enemyAnim);
+        wolfImageView.setImageResource(R.drawable.wolfrun);
+        wolfState = (AnimationDrawable)wolfImageView.getDrawable();
+        wolfState.start();
+        moveWolf();
 
         Button1 = (Button)findViewById(R.id.jumpButton);
         Button2 = (Button)findViewById(R.id.attackButton);
@@ -97,20 +121,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 //        screenWidth = size.x;
 //        screenHeight = size.y;
 
-        //Start the timer
-//        timer.schedule(new TimerTask(){
-//            @Override
-//            public void run() {
-//                handler.post(new Runnable() {
-//                    @Override
-//                    public void run() {
-//
-//                   }
-//                });
-//            }
-//        }, 0, 20);
+        //trying to set the location of the rect to be where our imageview is for the player
+        //rectPlayer.set();
 
-
+        //game loop
         myHandler = new Handler() {
 
             public void handleMessage(Message msg) {
@@ -154,14 +168,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 }
 
-
                 myHandler.sendEmptyMessageDelayed(0, loopTime);
                 buttonPressed = false;
 
             }
         };
         //I'm not sure where to put this to make it work
-        //updateScore(enemiesKilled);
         updateScore(enemiesKilled);
         updateLevel();
 
@@ -185,44 +197,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-//    public void pausePushed(View view) {
-//        if (isPaused == false) {
-//            isPaused = true;
-//
-//            //stop the timer
-//            timer.cancel();
-//            timer = null;
-//
-//            //change button text
-//            pauseButton.setText("Resume");
-//        } else {
-//            isPaused = false;
-//
-//            //change button text back
-//            pauseButton.setText("Pause");
-//
-//            //create and start the timer
-//            timer = new Timer();
-//            timer.schedule(new TimerTask(){
-//                @Override
-//                public void run() {
-//                    handler.post(new Runnable() {
-//                        @Override
-//                        public void run() {
-//
-//                        }
-//                    });
-//                }
-//            }, 0, 20);
-//        }
-//    }
-
-
-
     public void moveAnimationUp() {
         Animation img = new TranslateAnimation(Animation.ABSOLUTE, Animation.ABSOLUTE, 0, -300);
         img.setDuration(800);
-
 
         minotaurImageView.startAnimation(img);
         //myHandler.sendEmptyMessageDelayed(0, 800);
@@ -233,9 +210,36 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         Animation img = new TranslateAnimation(Animation.ABSOLUTE, Animation.ABSOLUTE, -300, 0);
         img.setDuration(800);
 
-
-
         minotaurImageView.startAnimation(img);
+    }
+
+    public void moveWolf() {
+        Animation img = new TranslateAnimation(200, -2000 ,Animation.ABSOLUTE, Animation.ABSOLUTE);
+        img.setDuration(5000);
+        img.setRepeatCount(1000);
+
+
+        wolfImageView.startAnimation(img);
+    }
+
+    public boolean checkCollision(View playerWalkAnim, View enemyAnim) {
+        Rect playerRect = new Rect(playerWalkAnim.getLeft(), playerWalkAnim.getTop(), playerWalkAnim.getRight(), playerWalkAnim.getBottom());
+        Rect enemyRect = new Rect(enemyAnim.getLeft(), enemyAnim.getTop(), enemyAnim.getRight(), enemyAnim.getBottom());
+        return playerRect.intersect(enemyRect);
+    }
+
+    public void gameOver() {
+        if (isGameOver) {
+
+            //update the high score
+            if (currentScore > hiScore) {
+                hiScore = currentScore;
+                editor.putInt(intName, hiScore);
+                editor.commit();
+                Toast.makeText(getApplicationContext(), "New High Score!",
+                        Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     @Override
@@ -247,14 +251,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 //
                 buttonPressed = true;
                 animation = 1;
-                //scrollingBackground.setSpeed(3);
+
                 break;
 
             case R.id.jumpButton:
                 buttonPressed = true;
                 animation = 3;
-                //scrollingBackground.setSpeed(3);
-                //moveAnimation();
+
 
                 break;
 
@@ -262,18 +265,14 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 //
                 animation = 2;
                 buttonPressed = true;
-                //scrollingBackground.setSpeed(10);
-               /* if(animation == 2) {
-                    scrollingBackground.setSpeed(10);
-                } else {
-                    scrollingBackground.setSpeed(1);
-                }*/
+
                 break;
 
             case R.id.pauseButton:
                 if (isPaused) {
                     minotaurState.start();
                     scrollingBackground.start();
+                    wolfState.start();
                     // *** Use "minotaurImageView" and try to stop the animation
 
                     isPaused = false;
@@ -285,6 +284,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 } else {
                     minotaurState.stop();
                     scrollingBackground.stop();
+                    wolfState.stop();
 
                     isPaused = true;
 
@@ -322,20 +322,20 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-//    public void pause() {
-//        playingGame = false;
-//        try {
-//            ourThread.join();
-//        } catch (InterruptedException e) {
-//
-//        }
-//    }
-//
-//    public void resume() {
-//        playingGame = true;
-//        ourThread = new Thread(this);
-//        ourThread.start();
-//    }
+    public void pause() {
+        playingGame = false;
+        try {
+            ourThread.join();
+        } catch (InterruptedException e) {
+
+        }
+    }
+
+    public void resume() {
+        playingGame = true;
+        ourThread = new Thread((Runnable) this);
+        ourThread.start();
+    }
 
     @Override
     protected void onPause() {

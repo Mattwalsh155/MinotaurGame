@@ -2,14 +2,21 @@ package com.example.minotaurgame;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.TextView;
 
 public class MainActivity extends Activity implements View.OnClickListener {
-
+    //for the Hi scores
+    SharedPreferences prefs;
+    String dataName = "MyData";
+    String intName = "MyString";
+    int defaultInt = 0;
+    public static int hiScore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,6 +26,18 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.activity_main);
+
+        //for our High score
+        //initialize our two SharedPreferences objects
+        prefs = getSharedPreferences(dataName, MODE_PRIVATE);
+
+        //either load our hiScore or default to 0
+        hiScore = prefs.getInt(intName, defaultInt);
+
+        //Make a reference to the Hiscore textview
+        TextView hiScoreText = findViewById(R.id.hiScoreText);
+        //displays the High score
+        hiScoreText.setText("High Score:" + hiScore);
 
         Button playButton = (Button)findViewById(R.id.playButton);
 
@@ -30,6 +49,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
         Intent i;
         i = new Intent(this, GameActivity.class);
         startActivity(i);
+
+        finish();
     }
 
     @Override
