@@ -162,6 +162,16 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
         //trying to set the location of the rect to be where our imageview is for the player
         //rectPlayer.set();
+        Rect recMinotaur = new Rect();
+        minotaurImageView.getDrawingRect(recMinotaur);
+
+        Rect recWolf = new Rect();
+        wolfImageView.getDrawingRect(recWolf);
+
+        if(Rect.intersects(recMinotaur, recWolf)){
+            //Kill the player.
+
+        }
 
         //game loop
         myHandler = new Handler() {
@@ -217,6 +227,10 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         updateLevel();
 
         myHandler.sendEmptyMessage(0);
+    }
+
+    public void collision(){
+
     }
 
     public void SetAnimation(int id, int lt, boolean goUp, boolean goDown) {
