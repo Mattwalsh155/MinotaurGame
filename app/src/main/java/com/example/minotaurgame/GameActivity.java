@@ -162,16 +162,33 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
         //trying to set the location of the rect to be where our imageview is for the player
         //rectPlayer.set();
-        Rect recMinotaur = new Rect();
-        minotaurImageView.getDrawingRect(recMinotaur);
+//        Rect recMinotaur = new Rect();
+//        minotaurImageView.getDrawingRect(recMinotaur);
+//
+//        Rect recWolf = new Rect();
+//        wolfImageView.getDrawingRect(recWolf);
 
-        Rect recWolf = new Rect();
-        wolfImageView.getDrawingRect(recWolf);
 
-        if(Rect.intersects(recMinotaur, recWolf)){
-            //Kill the player.
+        Rect rectMinotaur = new Rect();
+        Rect rectWolf = new Rect();
+
+
+        minotaurImageView.getHitRect(rectMinotaur);
+        wolfImageView.getHitRect(rectWolf);
+        rectMinotaur.intersect(rectWolf);
+
+
+
+        if (Rect.intersects(rectMinotaur,rectWolf)) {
+            soundPool.play(jump,1,1,0,0,1);
 
         }
+
+
+//        if(Rect.intersects(recMinotaur, recWolf)){
+//            //Kill the player.
+//            soundPool.play(jump,1,1,0,0,1);
+//        }
 
         //game loop
         myHandler = new Handler() {
@@ -228,6 +245,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
         myHandler.sendEmptyMessage(0);
     }
+
+
 
     public void collision(){
 
