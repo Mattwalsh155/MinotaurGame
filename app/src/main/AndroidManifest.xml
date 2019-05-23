@@ -4,10 +4,9 @@
 
     <supports-screens
         android:largeScreens="true"
-        android:smallScreens="true"
         android:normalScreens="true"
-        android:xlargeScreens="true"
-        />
+        android:smallScreens="true"
+        android:xlargeScreens="true" />
 
     <application
         android:allowBackup="true"
@@ -16,8 +15,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".GameActivity" android:screenOrientation="sensorLandscape"></activity>
-        <activity android:name=".MainActivity" android:screenOrientation="sensorLandscape">
+        <activity android:name=".controls"></activity>
+        <activity
+            android:name=".GameActivity"
+            android:screenOrientation="sensorLandscape" />
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="sensorLandscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

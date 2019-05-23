@@ -1,11 +1,18 @@
 package com.example.minotaurgame;
 
 import android.content.Context;
+
+import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
+
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+
 import android.graphics.drawable.AnimationDrawable;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -18,12 +25,17 @@ import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
+
+import android.media.MediaPlayer;
+
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.q42.android.scrollingimageview.ScrollingImageView;
 
 import java.util.Random;
+
+import java.io.IOException;
 import java.util.Timer;
 
 public class GameActivity extends AppCompatActivity implements View.OnClickListener {
@@ -58,6 +70,16 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     private int animation = 0;
     private boolean buttonPressed = true;
     private int loopTime = 900;
+
+
+    MediaPlayer music;
+
+    private SoundPool soundPool;
+    int jump = -1;
+    int slide = -1;
+    int attack = -1;
+
+    private float jumpXVelocity;
 
     private Timer timer = new Timer();
     private Handler handler = new Handler();
@@ -128,6 +150,23 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
+        soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC,0);
+        try{
+            AssetManager assetManager = getAssets();
+            AssetFileDescriptor descriptor;
+
+            descriptor = assetManager.openFd("jump.wav");
+            jump = soundPool.load(descriptor, 0);
+
+            descriptor = assetManager.openFd("hit.wav");
+            attack = soundPool.load(descriptor, 0);
+
+            descriptor = assetManager.openFd("slide.wav");
+            slide = soundPool.load(descriptor, 0);
+        }catch (IOException e){}
+
+        music();
+
         setContentView(R.layout.activity_game);
 
         prefs = getSharedPreferences(dataName, MODE_PRIVATE);
@@ -172,6 +211,33 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
         //trying to set the location of the rect to be where our imageview is for the player
         //rectPlayer.set();
+//        Rect recMinotaur = new Rect();
+//        minotaurImageView.getDrawingRect(recMinotaur);
+//
+//        Rect recWolf = new Rect();
+//        wolfImageView.getDrawingRect(recWolf);
+
+
+        Rect rectMinotaur = new Rect();
+        Rect rectWolf = new Rect();
+
+
+        minotaurImageView.getHitRect(rectMinotaur);
+        wolfImageView.getHitRect(rectWolf);
+        rectMinotaur.intersect(rectWolf);
+
+
+
+        if (Rect.intersects(rectMinotaur,rectWolf)) {
+            soundPool.play(jump,1,1,0,0,1);
+
+        }
+
+
+//        if(Rect.intersects(recMinotaur, recWolf)){
+//            //Kill the player.
+//            soundPool.play(jump,1,1,0,0,1);
+//        }
 
         //game loop
         myHandler = new Handler() {
@@ -229,6 +295,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         myHandler.sendEmptyMessage(0);
     }
 
+
+
+    public void collision(){
+
+    }
+
     public void SetAnimation(int id, int lt, boolean goUp, boolean goDown) {
         minotaurImageView = findViewById(R.id.playerWalkAnim);
         minotaurImageView.setImageResource(id);
@@ -243,6 +315,25 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         if (goDown) {
             moveAnimationDown();
         }
+    }
+
+    public void music(){
+        if(music == null){
+            music = MediaPlayer.create(this,R.raw.soundtrack);
+            if(music != null){
+                music = MediaPlayer.create(this,R.raw.soundtrack2);
+                music.setLooping(true);
+            }
+        }
+        music.start();
+    }
+
+
+
+
+
+    public void time(){
+
     }
 
 
@@ -301,19 +392,35 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 buttonPressed = true;
                 animation = 1;
 
+                soundPool.play(attack, 1, 1, 0, 0, 1);
+
+
                 break;
 
             case R.id.jumpButton:
                 buttonPressed = true;
                 animation = 3;
 
+                soundPool.play(jump, 1, 1, 0, 0, 1);
+                //moveAnimation();
+
 
                 break;
 
             case R.id.slideButton:
+
+//                ImageView minotaurSlide = (ImageView) findViewById(R.id.playerWalkAnim);
+//                minotaurSlide.setImageResource(R.drawable.slidingminotaur);
+//                slidingMinotaur = (AnimationDrawable) minotaurSlide.getDrawable();
+//                slidingMinotaur.start();
+
 //
                 animation = 2;
+
                 buttonPressed = true;
+                animation = 2;
+                soundPool.play(slide, 1, 1, 0, 0, 1);
+
 
                 break;
 
