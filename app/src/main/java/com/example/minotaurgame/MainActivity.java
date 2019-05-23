@@ -11,6 +11,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 public class MainActivity extends Activity implements View.OnClickListener {
+
+
     //for the Hi scores
     SharedPreferences prefs;
     String dataName = "MyData";

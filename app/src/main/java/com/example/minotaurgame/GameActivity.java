@@ -1,12 +1,16 @@
 package com.example.minotaurgame;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
+import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -19,9 +23,16 @@ import android.widget.Toast;
 
 import com.q42.android.scrollingimageview.ScrollingImageView;
 
+import java.util.Random;
 import java.util.Timer;
 
 public class GameActivity extends AppCompatActivity implements View.OnClickListener {
+
+    //I'm not sure about making a constructor?
+//    public GameActivity(Context context) {
+//        super(context);
+//    }
+
 
     Button Button1;
     Button Button2;
@@ -72,6 +83,44 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     int defaultInt = 0;
     int hiScore;
 
+    //Stuff to add a canvas... I don't think we need this
+    private Paint paint;
+    private Canvas canvas;
+    private SurfaceHolder ourHolder;
+
+    //randomizing enemies
+    private int x, y;
+    private int maxX;
+    private int minX;
+
+    private int maxY;
+    private int minY;
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public void enemiesSpawn(Context context, int screenX, int screenY) {
+        maxX = screenX;
+        maxY = screenY;
+        minX = 0;
+        minY = 0;
+
+        Random generator = new Random();
+
+        x = screenX;
+        y = generator.nextInt(maxY) - wolfImageView.getHeight();
+
+        if (x < minX-wolfImageView.getWidth()) {
+            x = maxX;
+            y = generator.nextInt(maxY) - wolfImageView.getHeight();
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,7 +134,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         editor = prefs.edit();
         hiScore = prefs.getInt(intName, defaultInt);
 
-        minotaurImageView = (ImageView)findViewById(R.id.playerWalkAnim);
+        minotaurImageView = findViewById(R.id.playerWalkAnim);
         minotaurImageView.setImageResource(R.drawable.runningminotaur);
         minotaurState = (AnimationDrawable)minotaurImageView.getDrawable();
         minotaurState.start();
@@ -96,22 +145,22 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         wolfState.start();
         moveWolf();
 
-        Button1 = (Button)findViewById(R.id.jumpButton);
-        Button2 = (Button)findViewById(R.id.attackButton);
-        Button3 = (Button)findViewById(R.id.slideButton);
-        pauseButton = (Button)findViewById(R.id.pauseButton);
+        Button1 = findViewById(R.id.jumpButton);
+        Button2 = findViewById(R.id.attackButton);
+        Button3 = findViewById(R.id.slideButton);
+        pauseButton = findViewById(R.id.pauseButton);
 
         Button1.setOnClickListener(this);
         Button2.setOnClickListener(this);
         Button3.setOnClickListener(this);
         pauseButton.setOnClickListener(this);
 
-        scrollingBackground = (ScrollingImageView)findViewById(R.id.scrolling_background);
+        scrollingBackground = findViewById(R.id.scrolling_background);
         scrollingBackground.setSpeed(3);
         int enemiesKilled = 0;
 
-        scoreText = (TextView)findViewById(R.id.scoreText);
-        levelText = (TextView)findViewById(R.id.levelText);
+        scoreText = findViewById(R.id.scoreText);
+        levelText = findViewById(R.id.levelText);
 
         // Get screen size
 //        WindowManager wm = getWindowManager();
@@ -340,12 +389,14 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onPause() {
         super.onPause();
+        //R.layout.activity_game.pause();
         elapsedTime = elapsedTime + (System.currentTimeMillis() - startTime);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        //gameView.resume();
         startTime = (System.currentTimeMillis());
 
     }
