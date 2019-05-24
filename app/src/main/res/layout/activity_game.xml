@@ -112,8 +112,10 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:src="@drawable/wolf_run_01"/>
+       <!-- app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        scrolling_image_view:srcCompat="@drawable/wolf_run_01" />
+        scrolling_image_view:srcCompat="@drawable/wolf_run_01" /> -->
+
 
 </android.support.constraint.ConstraintLayout>
