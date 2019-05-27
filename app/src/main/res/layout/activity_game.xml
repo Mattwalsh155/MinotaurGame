@@ -59,17 +59,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/minotaur_walk_01" />
 
-    <ImageView
-        android:id="@+id/playerDeath"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="parent"
-        app:srcCompat="@drawable/minotaur_death_01"/>
-
-
 
     <TextView
         android:id="@+id/scoreText"
@@ -78,7 +67,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="Score: 999"
+        android:text="Score: 0"
         android:textColor="#FFFFFF"
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="parent"
@@ -94,6 +83,22 @@
         android:textColor="#FFFFFF"
         android:textSize="24sp"
         app:layout_constraintStart_toEndOf="@+id/scoreText"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/gameOverText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="GAME OVER!"
+        android:textColor="#00D31919"
+        android:textSize="64sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
@@ -112,10 +117,11 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:src="@drawable/wolf_run_01"/>
-       <!-- app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        scrolling_image_view:srcCompat="@drawable/wolf_run_01" /> -->
+        android:src="@drawable/wolf_run_01" />
+
+    <!-- app:layout_constraintBottom_toBottomOf="parent"
+     app:layout_constraintEnd_toEndOf="parent"
+     scrolling_image_view:srcCompat="@drawable/wolf_run_01" /> -->
 
 
 </android.support.constraint.ConstraintLayout>

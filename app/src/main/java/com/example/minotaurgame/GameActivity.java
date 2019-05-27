@@ -1,5 +1,6 @@
 package com.example.minotaurgame;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
@@ -32,6 +33,7 @@ import com.q42.android.scrollingimageview.ScrollingImageView;
 
 import java.io.IOException;
 import java.util.Timer;
+import java.util.TimerTask;
 
 public class GameActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -53,13 +55,16 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     ImageView wolfImageView;
     //
     //positions
-    private float wolfImageViewX;
-    private float WolfImageViewY;
+    public int wolfImageViewX;
+    public int wolfImageViewY;
 
     private int wolfPosX;
+    private int wolfPosY;
     //
     TextView scoreText;
     TextView levelText;
+    TextView gameOverText;
+
     //
     int currentScore = 0;
     int currentLevel = 1;
@@ -115,7 +120,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     public long loopTimer;
     public long loopTimer2;
 
-
+    public boolean isOverlapping = false;
+    public boolean isAttacking = false;
+    public int enemiesKilled = 0;
 
     //randomizing enemies
 //    private int x, y;
@@ -190,7 +197,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         wolfImageView.setImageResource(R.drawable.wolfrun);
         wolfState = (AnimationDrawable) wolfImageView.getDrawable();
         wolfState.start();
-        moveWolf();
+        //moveWolf();
 
         Button1 = findViewById(R.id.jumpButton);
         Button2 = findViewById(R.id.attackButton);
@@ -204,11 +211,12 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
         scrollingBackground = findViewById(R.id.scrolling_background);
         scrollingBackground.setSpeed(3);
-        int enemiesKilled = 0;
+        //int enemiesKilled = 0;
 
         scoreText = findViewById(R.id.scoreText);
         levelText = findViewById(R.id.levelText);
-
+        //gameOverText = findViewById(R.id.gameOverText);
+        //gameOverText.setVisibility(View.INVISIBLE);
 
         loopTimer = System.currentTimeMillis();
         loopTimer2 = System.currentTimeMillis();
@@ -223,25 +231,22 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
         //move the position
         wolfPosX = size.x;
+        wolfPosY = size.y;
         wolfImageView.setX(wolfPosX);
-        wolfImageView.setY(80);
+        wolfImageView.setY(wolfPosY);
 
-        // start the timer
-//        timer.schedule(new TimerTask() {
-//            @Override
-//            public void run() {
-//                handler.post(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        changePos();
-//                    }
-//                });
-//            }
-//        }, 0, 20);
-
-//        public void changePos() {
-//
-//        }
+         //start the timer
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        changePos();
+                    }
+                });
+            }
+        }, 0, 20);
 
 
         //trying to set the location of the rect to be where our imageview is for the player
@@ -283,6 +288,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
                         case 1:
                             SetAnimation(R.drawable.attackingminotaur, 1600, false, false);
+                            isAttacking = true;
                             break;
 
                         case 2:
@@ -314,8 +320,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 myHandler.sendEmptyMessageDelayed(0, loopTime);
                 buttonPressed = false;
                 checkCollisions();
-                wolfPosX-= 100;
-                wolfImageView.setX(wolfPosX);
+                //wolfPosX-= 100;
+                //wolfImageView.setX(wolfPosX);
 
             }
 
@@ -343,26 +349,72 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    public void changePos() {
+    //move to the left
+        wolfImageViewX -= 10;
+        if (wolfImageView.getX() + wolfImageView.getWidth() <= 0) {
+            wolfImageViewX = screenWidth + 100;
+            wolfImageViewY = screenHeight - 170;
+            isOverlapping = false;
+        }
+        wolfImageView.setX(wolfImageViewX);
+        wolfImageView.setY(wolfImageViewY);
+    }
 
 
     public void checkCollisions(){
         Rect rectMinotaur = new Rect();
         Rect rectWolf = new Rect();
 
-        minotaurImageView.getX();
-        wolfImageView.getDrawable().copyBounds();
-//        minotaurImageView.getDrawingRect(rectMinotaur);
-//        wolfImageView.getDrawingRect(rectWolf);
+        //minotaurImageView.getX();
+        //wolfImageView.getDrawable().copyBounds();
+        //minotaurImageView.getDrawingRect(rectMinotaur);
+        //wolfImageView.getDrawingRect(rectWolf);
+        //minotaurImageView.getDrawable().copyBounds();
+        //wolfImageView.getDrawable().copyBounds();
+        minotaurImageView.getHitRect(rectMinotaur);
+        wolfImageView.getHitRect(rectWolf);
+
 
         Log.d("Matt", "minoPosX : " + minotaurImageView.getX());
         Log.d("Matt", "minoPosY : " + minotaurImageView.getY());
         Log.d("Matt", "wolfPosX : " + wolfImageView.getX());
         Log.d("Matt", "wolfPosY : " + wolfImageView.getY());
 
-        if (Rect.intersects(rectMinotaur,rectWolf)) {
-            soundPool.play(jump,1,1,0,0,1);
+        if(Rect.intersects(rectMinotaur,rectWolf)&& isAttacking){
+            wolfDeath();
 
+        } else {
+            if (Rect.intersects(rectMinotaur, rectWolf)) {
+                //soundPool.play(jump,1,1,0,0,1);
+                SetAnimation(R.drawable.dyingminotaur, 1100, false, false);
+                scrollingBackground.setSpeed(0);
+                isOverlapping = true;
+                gameOver();
+                isGameOver = true;
+
+            }
         }
+    }
+    public void wolfDeath(){
+        //SetAnimation(R.drawable.attackingminotaur,1100,false,false);
+        //scrollingBackground.setSpeed(0);
+        isAttacking = false;
+        isOverlapping = false;
+        wolfImageViewX = screenWidth + 100;
+        wolfImageViewY = screenHeight - 170;
+        wolfImageView.setX(wolfImageViewX);
+        wolfImageView.setY(wolfImageViewY);
+        isOverlapping = false;
+//        wolfImageView = findViewById(R.id.enemyAnim);
+//        wolfImageView.setImageResource(R.drawable.wolfdeath);
+//        wolfState = (AnimationDrawable) wolfImageView.getDrawable();
+//        wolfState.start();
+
+        //currentScore ++;
+        //enemiesKilled ++;
+        updateScore();
+
     }
 
     public void SetAnimation(int id, int lt, boolean goUp, boolean goDown) {
@@ -417,6 +469,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         minotaurImageView.startAnimation(img);
     }
 
+    //This method is no longer needed. Don't think it's doing anything?
     public void moveWolf() {
         Animation img = new TranslateAnimation(Animation.ABSOLUTE, Animation.ABSOLUTE ,Animation.ABSOLUTE, Animation.ABSOLUTE);
         img.setDuration(5000);
@@ -434,6 +487,11 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     public void gameOver() {
         if (isGameOver) {
+            //gameOverText.setVisibility(View.VISIBLE);
+            Intent intent = new Intent(this, gameOver.class);
+            startActivity(intent);
+
+            finish();
 
             //update the high score
             if (currentScore > hiScore) {
@@ -526,11 +584,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    void updateScore(int enemiesKilled) {
+    void updateScore() {
 
-        for (int i = 1; i <= enemiesKilled; i++) {
-            currentScore = currentScore + i * 10;
-        }
+        currentScore = (currentScore + 10);
 
         scoreText.setText("Score: " + currentScore);
     }
