@@ -1,24 +1,12 @@
 package com.example.minotaurgame;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.TextView;
 
-public class MainActivity extends Activity implements View.OnClickListener {
-
-
-    //for the Hi scores
-    SharedPreferences prefs;
-    String dataName = "MyData";
-    String intName = "MyString";
-    int defaultInt = 0;
-    public static int hiScore;
+public class gameOver extends AppCompatActivity implements View.OnClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,52 +14,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-        setContentView(R.layout.activity_main);
-
-        //for our High score
-        //initialize our two SharedPreferences objects
-        prefs = getSharedPreferences(dataName, MODE_PRIVATE);
-
-        //either load our hiScore or default to 0
-        hiScore = prefs.getInt(intName, defaultInt);
-
-        //Make a reference to the Hiscore textview
-        TextView hiScoreText = findViewById(R.id.hiScoreText);
-        //displays the High score
-        hiScoreText.setText("High Score:" + hiScore);
-
-        Button playButton = (Button)findViewById(R.id.playButton);
-
-        playButton.setOnClickListener(this);
-
-        final Button controls = (Button)findViewById(R.id.controls);
-
-        controls.setOnClickListener(this);
-
+        setContentView(R.layout.activity_game_over);
     }
-
-
 
     @Override
     public void onClick(View v) {
-        Intent i;
-        Intent j;
-        /*Intent controlIntent = new Intent(getApplicationContext(),controls.class);
-        startActivity(controlIntent);*/
 
-        i = new Intent(this, GameActivity.class);
-        startActivity(i);
-
-
-
-        j = new Intent(this, controls.class);
-        startActivity(j);
-
-
-
-
-        finish();
     }
 
     @Override

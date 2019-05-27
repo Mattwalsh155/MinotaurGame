@@ -1,6 +1,5 @@
 package com.example.minotaurgame;
 
-
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
@@ -8,15 +7,22 @@ import android.content.res.AssetManager;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.content.Intent;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.Rect;
-
 import android.graphics.drawable.AnimationDrawable;
 import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.Display;
+import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -24,26 +30,23 @@ import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
-
-import android.media.MediaPlayer;
-
 import android.widget.TextView;
 import android.widget.Toast;
 
 
 import com.q42.android.scrollingimageview.ScrollingImageView;
 
-
 import java.io.IOException;
 import java.util.Random;
 import java.util.Timer;
+import java.util.TimerTask;
 
 public class GameActivity extends AppCompatActivity implements View.OnClickListener {
 
 
 
-public Bitmap bitmap;
 
+public Bitmap bitmap;
     Button Button1;
     Button Button2;
     Button Button3;
@@ -59,14 +62,23 @@ public Bitmap bitmap;
     ImageView ratImageview;
     ImageView ghostImageview;
     //
+    //positions
+    public int wolfImageViewX;
+    public int wolfImageViewY;
+
+    private int wolfPosX;
+    private int wolfPosY;
+    //
     TextView scoreText;
     TextView levelText;
+    TextView gameOverText;
+
     //
     int currentScore = 0;
     int currentLevel = 1;
     //
-    int screenWidth;
-    int screenHeight;
+    private int screenWidth;
+    private int screenHeight;
     //
     private Handler myHandler;
     private int animation = 0;
@@ -101,12 +113,58 @@ public Bitmap bitmap;
 
     private Rect rectPlayer;
 
+    private boolean running = true;
+
     SharedPreferences prefs;
     SharedPreferences.Editor editor;
     String dataName = "MyData";
     String intName = "MyInt";
     int defaultInt = 0;
     int hiScore;
+
+    //Stuff to add a canvas... I don't think we need this
+    private Paint paint;
+    private Canvas canvas;
+    private SurfaceHolder ourHolder;
+    public long loopTimer;
+    public long loopTimer2;
+
+    public boolean isOverlapping = false;
+    public boolean isAttacking = false;
+    public int enemiesKilled = 0;
+
+    //randomizing enemies
+//    private int x, y;
+//    private int maxX;
+//    private int minX;
+//
+//    private int maxY;
+//    private int minY;
+//
+//    public int getX() {
+//        return x;
+//    }
+//
+//    public int getY() {
+//        return y;
+//    }
+//
+//    public void enemiesSpawn(Context context, int screenX, int screenY) {
+//        maxX = screenX;
+//        maxY = screenY;
+//        minX = 0;
+//        minY = 0;
+//
+//        Random generator = new Random();
+//
+//        x = screenX;
+//        y = generator.nextInt(maxY) - wolfImageView.getHeight();
+//
+//        if (x < minX-wolfImageView.getWidth()) {
+//            x = maxX;
+//            y = generator.nextInt(maxY) - wolfImageView.getHeight();
+//        }
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,8 +173,8 @@ public Bitmap bitmap;
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC,0);
-        try{
+        soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
+        try {
             AssetManager assetManager = getAssets();
             AssetFileDescriptor descriptor;
 
@@ -128,7 +186,8 @@ public Bitmap bitmap;
 
             descriptor = assetManager.openFd("slide.wav");
             slide = soundPool.load(descriptor, 0);
-        }catch (IOException e){}
+        } catch (IOException e) {
+        }
 
         music();
 
@@ -138,44 +197,68 @@ public Bitmap bitmap;
         editor = prefs.edit();
         hiScore = prefs.getInt(intName, defaultInt);
 
-        minotaurImageView = (ImageView)findViewById(R.id.playerWalkAnim);
+        minotaurImageView = findViewById(R.id.playerWalkAnim);
         minotaurImageView.setImageResource(R.drawable.runningminotaur);
-        minotaurState = (AnimationDrawable)minotaurImageView.getDrawable();
+        minotaurState = (AnimationDrawable) minotaurImageView.getDrawable();
         minotaurState.start();
 
         wolfImageView = findViewById(R.id.enemyAnim);
         wolfImageView.setImageResource(R.drawable.wolfrun);
-        wolfState = (AnimationDrawable)wolfImageView.getDrawable();
+        wolfState = (AnimationDrawable) wolfImageView.getDrawable();
         wolfState.start();
-        moveWolf();
+        //moveWolf();
 
-
-        Button1 = (Button)findViewById(R.id.jumpButton);
-        Button2 = (Button)findViewById(R.id.attackButton);
-        Button3 = (Button)findViewById(R.id.slideButton);
-        pauseButton = (Button)findViewById(R.id.pauseButton);
+        Button1 = findViewById(R.id.jumpButton);
+        Button2 = findViewById(R.id.attackButton);
+        Button3 = findViewById(R.id.slideButton);
+        pauseButton = findViewById(R.id.pauseButton);
 
         Button1.setOnClickListener(this);
         Button2.setOnClickListener(this);
         Button3.setOnClickListener(this);
         pauseButton.setOnClickListener(this);
 
-        scrollingBackground = (ScrollingImageView)findViewById(R.id.scrolling_background);
+        scrollingBackground = findViewById(R.id.scrolling_background);
         scrollingBackground.setSpeed(3);
-        int enemiesKilled = 0;
+        //int enemiesKilled = 0;
 
-        scoreText = (TextView)findViewById(R.id.scoreText);
-        levelText = (TextView)findViewById(R.id.levelText);
+        scoreText = findViewById(R.id.scoreText);
+        levelText = findViewById(R.id.levelText);
+        //gameOverText = findViewById(R.id.gameOverText);
+        //gameOverText.setVisibility(View.INVISIBLE);
+
+        loopTimer = System.currentTimeMillis();
+        loopTimer2 = System.currentTimeMillis();
 
 
 
         // Get screen size
-//        WindowManager wm = getWindowManager();
-//        Display disp = wm.getDefaultDisplay();
-//        Point size = new Point();
-//        disp.getSize(size);
-//        screenWidth = size.x;
-//        screenHeight = size.y;
+        WindowManager wm = getWindowManager();
+        Display disp = wm.getDefaultDisplay();
+        Point size = new Point();
+        disp.getSize(size);
+        screenWidth = size.x;
+        screenHeight = size.y;
+
+        //move the position
+        wolfPosX = size.x;
+        wolfPosY = size.y;
+        wolfImageView.setX(wolfPosX);
+        wolfImageView.setY(wolfPosY);
+
+         //start the timer
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        changePos();
+                    }
+                });
+            }
+        }, 0, 20);
+
 
         //trying to set the location of the rect to be where our imageview is for the player
         //rectPlayer.set();
@@ -186,20 +269,11 @@ public Bitmap bitmap;
 //        wolfImageView.getDrawingRect(recWolf);
 
 
-        Rect rectMinotaur = new Rect();
-        Rect rectWolf = new Rect();
-
-
-        minotaurImageView.getHitRect(rectMinotaur);
-        wolfImageView.getHitRect(rectWolf);
-        rectMinotaur.intersect(rectWolf);
 
 
 
-        if (Rect.intersects(rectMinotaur,rectWolf)) {
-            soundPool.play(jump,1,1,0,0,1);
 
-        }
+
 
 
 //        if(Rect.intersects(recMinotaur, recWolf)){
@@ -213,6 +287,8 @@ public Bitmap bitmap;
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
 
+
+
                 if (!isPaused) {
 
                     switch (animation) {
@@ -223,6 +299,7 @@ public Bitmap bitmap;
 
                         case 1:
                             SetAnimation(R.drawable.attackingminotaur, 1600, false, false);
+                            isAttacking = true;
                             break;
 
                         case 2:
@@ -253,14 +330,46 @@ public Bitmap bitmap;
 
                 myHandler.sendEmptyMessageDelayed(0, loopTime);
                 buttonPressed = false;
+                checkCollisions();
+                //wolfPosX-= 100;
+                //wolfImageView.setX(wolfPosX);
 
             }
+
         };
+
+
+
+
+
+//            loopTimer2 = System.currentTimeMillis();
+//            if(loopTimer2 >= loopTimer + 100){
+//                loopTimer = System.currentTimeMillis();
+//
+//                gameOver();
+//                myHandler.sendEmptyMessageDelayed(0, 100);
+//            }
+            //updateScore(enemiesKilled);
+            //updateLevel();
+
+
         //I'm not sure where to put this to make it work
-        updateScore(enemiesKilled);
-        updateLevel();
+
 
         myHandler.sendEmptyMessage(0);
+
+    }
+
+    public void changePos() {
+    //move to the left
+        wolfImageViewX -= 10;
+        if (wolfImageView.getX() + wolfImageView.getWidth() <= 0) {
+            wolfImageViewX = screenWidth + 100;
+            wolfImageViewY = screenHeight - 170;
+            isOverlapping = false;
+        }
+        wolfImageView.setX(wolfImageViewX);
+        wolfImageView.setY(wolfImageViewY);
 
     }
 
@@ -287,7 +396,58 @@ public Bitmap bitmap;
 //        }
 //    }
 
-    public void collision(){
+    public void checkCollisions(){
+        Rect rectMinotaur = new Rect();
+        Rect rectWolf = new Rect();
+
+        //minotaurImageView.getX();
+        //wolfImageView.getDrawable().copyBounds();
+        //minotaurImageView.getDrawingRect(rectMinotaur);
+        //wolfImageView.getDrawingRect(rectWolf);
+        //minotaurImageView.getDrawable().copyBounds();
+        //wolfImageView.getDrawable().copyBounds();
+        minotaurImageView.getHitRect(rectMinotaur);
+        wolfImageView.getHitRect(rectWolf);
+
+
+        Log.d("Matt", "minoPosX : " + minotaurImageView.getX());
+        Log.d("Matt", "minoPosY : " + minotaurImageView.getY());
+        Log.d("Matt", "wolfPosX : " + wolfImageView.getX());
+        Log.d("Matt", "wolfPosY : " + wolfImageView.getY());
+
+        if(Rect.intersects(rectMinotaur,rectWolf)&& isAttacking){
+            wolfDeath();
+
+        } else {
+            if (Rect.intersects(rectMinotaur, rectWolf)) {
+                //soundPool.play(jump,1,1,0,0,1);
+                SetAnimation(R.drawable.dyingminotaur, 1100, false, false);
+                scrollingBackground.setSpeed(0);
+                isOverlapping = true;
+                gameOver();
+                isGameOver = true;
+
+            }
+        }
+    }
+    public void wolfDeath(){
+        //SetAnimation(R.drawable.attackingminotaur,1100,false,false);
+        //scrollingBackground.setSpeed(0);
+        isAttacking = false;
+        isOverlapping = false;
+        wolfImageViewX = screenWidth + 100;
+        wolfImageViewY = screenHeight - 170;
+        wolfImageView.setX(wolfImageViewX);
+        wolfImageView.setY(wolfImageViewY);
+        isOverlapping = false;
+//        wolfImageView = findViewById(R.id.enemyAnim);
+//        wolfImageView.setImageResource(R.drawable.wolfdeath);
+//        wolfState = (AnimationDrawable) wolfImageView.getDrawable();
+//        wolfState.start();
+
+        //currentScore ++;
+        //enemiesKilled ++;
+        updateScore();
 
     }
 
@@ -339,22 +499,28 @@ public Bitmap bitmap;
         minotaurImageView.startAnimation(img);
     }
 
+    //This method is no longer needed. Don't think it's doing anything?
     public void moveWolf() {
-        Animation img = new TranslateAnimation(200, -2000 ,Animation.ABSOLUTE, Animation.ABSOLUTE);
+        Animation img = new TranslateAnimation(Animation.ABSOLUTE, Animation.ABSOLUTE ,Animation.ABSOLUTE, Animation.ABSOLUTE);
         img.setDuration(5000);
         img.setRepeatCount(-1);
 
         wolfImageView.startAnimation(img);
     }
 
-    public boolean checkCollision(View playerWalkAnim, View enemyAnim) {
-        Rect playerRect = new Rect(playerWalkAnim.getLeft(), playerWalkAnim.getTop(), playerWalkAnim.getRight(), playerWalkAnim.getBottom());
-        Rect enemyRect = new Rect(enemyAnim.getLeft(), enemyAnim.getTop(), enemyAnim.getRight(), enemyAnim.getBottom());
-        return playerRect.intersect(enemyRect);
-    }
+//    public boolean checkCollision(View playerWalkAnim, View enemyAnim) {
+//        Rect playerRect = new Rect(playerWalkAnim.getLeft(), playerWalkAnim.getTop(), playerWalkAnim.getRight(), playerWalkAnim.getBottom());
+//        Rect enemyRect = new Rect(enemyAnim.getLeft(), enemyAnim.getTop(), enemyAnim.getRight(), enemyAnim.getBottom());
+//        return playerRect.intersect(enemyRect);
+//    }
 
     public void gameOver() {
         if (isGameOver) {
+            //gameOverText.setVisibility(View.VISIBLE);
+            Intent intent = new Intent(this, gameOver.class);
+            startActivity(intent);
+
+            finish();
 
             //update the high score
             if (currentScore > hiScore) {
@@ -364,6 +530,7 @@ public Bitmap bitmap;
                 Toast.makeText(getApplicationContext(), "New High Score!",
                         Toast.LENGTH_LONG).show();
             }
+            running = false;
         }
     }
 
@@ -447,11 +614,9 @@ public Bitmap bitmap;
 
     }
 
-    void updateScore(int enemiesKilled) {
+    void updateScore() {
 
-        for (int i = 1; i <= enemiesKilled; i++) {
-            currentScore = currentScore + i * 10;
-        }
+        currentScore = (currentScore + 10);
 
         scoreText.setText("Score: " + currentScore);
     }
@@ -482,12 +647,14 @@ public Bitmap bitmap;
     @Override
     protected void onPause() {
         super.onPause();
+        //R.layout.activity_game.pause();
         elapsedTime = elapsedTime + (System.currentTimeMillis() - startTime);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        //gameView.resume();
         startTime = (System.currentTimeMillis());
 
     }
@@ -527,3 +694,4 @@ public Bitmap bitmap;
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
     }
 }
+
