@@ -1,10 +1,13 @@
 package com.example.minotaurgame;
 
 
+import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 
 import android.graphics.drawable.AnimationDrawable;
@@ -27,13 +30,19 @@ import android.media.MediaPlayer;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
 import com.q42.android.scrollingimageview.ScrollingImageView;
 
 
 import java.io.IOException;
+import java.util.Random;
 import java.util.Timer;
 
 public class GameActivity extends AppCompatActivity implements View.OnClickListener {
+
+
+
+public Bitmap bitmap;
 
     Button Button1;
     Button Button2;
@@ -42,9 +51,13 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     //
     AnimationDrawable minotaurState;
     AnimationDrawable wolfState;
+    AnimationDrawable ratState;
+    AnimationDrawable ghostState;
     //
     ImageView minotaurImageView;
     ImageView wolfImageView;
+    ImageView ratImageview;
+    ImageView ghostImageview;
     //
     TextView scoreText;
     TextView levelText;
@@ -67,6 +80,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     int jump = -1;
     int slide = -1;
     int attack = -1;
+
 
     private float jumpXVelocity;
 
@@ -135,6 +149,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         wolfState.start();
         moveWolf();
 
+
         Button1 = (Button)findViewById(R.id.jumpButton);
         Button2 = (Button)findViewById(R.id.attackButton);
         Button3 = (Button)findViewById(R.id.slideButton);
@@ -151,6 +166,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
         scoreText = (TextView)findViewById(R.id.scoreText);
         levelText = (TextView)findViewById(R.id.levelText);
+
+
 
         // Get screen size
 //        WindowManager wm = getWindowManager();
@@ -244,9 +261,31 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         updateLevel();
 
         myHandler.sendEmptyMessage(0);
+
     }
 
-
+//    class enemies {
+//
+//        private int x, y;
+//        private int maxX;
+//        private int minX;
+//
+//        public Bitmap getBitmap(){ return bitmap; }
+//
+//        public int getX(){ return x; }
+//
+//        public int getY(){ return y; }
+//
+//        public enemies(Context context, int screenX, int screenY){
+//            bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.rat_run);
+//            maxX = screenX;
+//            minX = 0;
+//
+//            Random generator = new Random();
+//
+//            x = screenX;
+//        }
+//    }
 
     public void collision(){
 
@@ -279,10 +318,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         music.start();
     }
 
-
-
-
-
     public void time(){
 
     }
@@ -307,8 +342,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     public void moveWolf() {
         Animation img = new TranslateAnimation(200, -2000 ,Animation.ABSOLUTE, Animation.ABSOLUTE);
         img.setDuration(5000);
-        img.setRepeatCount(1000);
-
+        img.setRepeatCount(-1);
 
         wolfImageView.startAnimation(img);
     }
@@ -391,6 +425,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                 } else {
                     minotaurState.stop();
                     scrollingBackground.stop();
+                    music.stop();
                     wolfState.stop();
 
                     isPaused = true;

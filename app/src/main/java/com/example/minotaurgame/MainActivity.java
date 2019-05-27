@@ -43,17 +43,31 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         playButton.setOnClickListener(this);
 
-        Button controls = (Button)findViewById(R.id.controls);
+        final Button controls = (Button)findViewById(R.id.controls);
 
         controls.setOnClickListener(this);
+
     }
+
+
 
     @Override
     public void onClick(View v) {
         Intent i;
         Intent j;
+        /*Intent controlIntent = new Intent(getApplicationContext(),controls.class);
+        startActivity(controlIntent);*/
+
         i = new Intent(this, GameActivity.class);
         startActivity(i);
+
+
+
+        j = new Intent(this, controls.class);
+        startActivity(j);
+
+
+
 
         finish();
     }

@@ -102,37 +102,48 @@
         android:id="@+id/ghost"
         android:layout_width="70dp"
         android:layout_height="93dp"
-        app:srcCompat="@drawable/ghostcontrol"
-        tools:layout_editor_absoluteX="406dp"
-        tools:layout_editor_absoluteY="301dp" />
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/down"
+        app:layout_constraintStart_toEndOf="@+id/wolf"
+        app:srcCompat="@drawable/ghostcontrol" />
 
     <ImageView
         android:id="@+id/wolf"
         android:layout_width="128dp"
         android:layout_height="89dp"
-        app:srcCompat="@drawable/wolfcontrol"
-        tools:layout_editor_absoluteX="222dp"
-        tools:layout_editor_absoluteY="305dp" />
+        android:layout_marginStart="32dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/rat"
+        app:srcCompat="@drawable/wolfcontrol" />
 
     <ImageView
         android:id="@+id/rat"
         android:layout_width="110dp"
         android:layout_height="57dp"
-        app:srcCompat="@drawable/ratcontrol"
-        tools:layout_editor_absoluteX="69dp"
-        tools:layout_editor_absoluteY="337dp" />
+        android:layout_marginStart="64dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/ratcontrol" />
 
     <TextView
         android:id="@+id/howtoplay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="24dp"
+        android:layout_marginEnd="8dp"
         android:text="How To Play"
         android:textColor="#0381DB"
         android:textSize="24sp"
         android:textStyle="bold"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="297dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/textView4"
@@ -162,12 +173,15 @@
         android:id="@+id/textView6"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="24dp"
         android:text="Slide"
         android:textColor="#2196F3"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/ghost"
-        tools:layout_editor_absoluteX="417dp" />
+        app:layout_constraintEnd_toStartOf="@+id/down"
+        app:layout_constraintStart_toEndOf="@+id/textView5" />
 
 </android.support.constraint.ConstraintLayout>
