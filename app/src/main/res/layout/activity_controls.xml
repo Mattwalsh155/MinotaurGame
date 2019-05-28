@@ -4,138 +4,170 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Controls">
+    tools:context=".controls">
+
 
     <ImageView
-        android:id="@+id/Background"
-        android:layout_width="748dp"
-        android:layout_height="409dp"
-        android:layout_marginStart="8dp"
+        android:id="@+id/background"
+        android:layout_width="735dp"
+        android:layout_height="425dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.515"
+        app:layout_constraintHorizontal_bias="0.166"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/castle2" />
+        app:layout_constraintVertical_bias="0.681"
+        app:srcCompat="@drawable/castlescene" />
 
-    <TextView
-        android:id="@+id/textView3"
+    <Button
+        android:id="@+id/back"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="100dp"
-        android:text="Slide"
-        android:textColor="#03A9F4"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toEndOf="@+id/textView5"
-        tools:layout_editor_absoluteY="184dp" />
-
-    <TextView
-        android:id="@+id/textView5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Attack"
-        android:textColor="#03A9F4"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        tools:layout_editor_absoluteX="233dp"
-        tools:layout_editor_absoluteY="184dp" />
-
-    <TextView
-        android:id="@+id/controls"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="How To Play"
-        android:textColor="#2196F3"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        tools:layout_editor_absoluteX="298dp"
-        tools:layout_editor_absoluteY="35dp" />
-
-    <ImageView
-        android:id="@+id/imageView9"
-        android:layout_width="136dp"
-        android:layout_height="173dp"
-        app:srcCompat="@android:drawable/arrow_up_float"
-        tools:layout_editor_absoluteX="514dp"
-        tools:layout_editor_absoluteY="43dp" />
-
-    <ImageView
-        android:id="@+id/imageView10"
-        android:layout_width="136dp"
-        android:layout_height="173dp"
-        app:srcCompat="@android:drawable/arrow_down_float"
-        tools:layout_editor_absoluteX="514dp"
-        tools:layout_editor_absoluteY="275dp" />
-
-    <ImageView
-        android:id="@+id/imageView11"
-        android:layout_width="135dp"
-        android:layout_height="130dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/imageView10"
-        app:layout_constraintTop_toBottomOf="@+id/imageView9"
-        app:srcCompat="@android:drawable/radiobutton_off_background"
-        tools:layout_editor_absoluteX="515dp" />
+        android:text="back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/up"
+        android:layout_width="129dp"
+        android:layout_height="104dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="50dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@android:drawable/arrow_up_float" />
+
+    <ImageView
+        android:id="@+id/attack"
+        android:layout_width="129dp"
+        android:layout_height="104dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/imageView2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/up"
+        app:srcCompat="@android:drawable/radiobutton_off_background" />
+
+    <ImageView
+        android:id="@+id/down"
+        android:layout_width="129dp"
+        android:layout_height="104dp"
+        android:layout_marginEnd="50dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@android:drawable/arrow_down_float"
+        tools:layout_editor_absoluteY="290dp" />
 
     <TextView
         android:id="@+id/Jump"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Jump"
-        android:textColor="#000000"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="@+id/imageView9"
-        app:layout_constraintStart_toStartOf="@+id/imageView9"
-        tools:layout_editor_absoluteY="131dp" />
+        android:textColor="#FD000000"
+        app:layout_constraintBottom_toBottomOf="@+id/up"
+        app:layout_constraintEnd_toEndOf="@+id/up"
+        app:layout_constraintHorizontal_bias="0.473"
+        app:layout_constraintStart_toStartOf="@+id/up"
+        app:layout_constraintTop_toTopOf="@+id/up"
+        app:layout_constraintVertical_bias="0.623" />
 
     <TextView
-        android:id="@+id/Slide"
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Attack"
+        android:textColor="#FD000000"
+        app:layout_constraintBottom_toBottomOf="@+id/attack"
+        app:layout_constraintEnd_toEndOf="@+id/attack"
+        app:layout_constraintStart_toStartOf="@+id/attack"
+        app:layout_constraintTop_toTopOf="@+id/attack" />
+
+    <TextView
+        android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Slide"
         android:textColor="#000000"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="@+id/imageView10"
-        app:layout_constraintStart_toStartOf="@+id/imageView10"
-        tools:layout_editor_absoluteY="335dp" />
+        app:layout_constraintBottom_toBottomOf="@+id/down"
+        app:layout_constraintEnd_toEndOf="@+id/down"
+        app:layout_constraintStart_toStartOf="@+id/down"
+        app:layout_constraintTop_toTopOf="@+id/down"
+        app:layout_constraintVertical_bias="0.352" />
+
+    <ImageView
+        android:id="@+id/ghost"
+        android:layout_width="70dp"
+        android:layout_height="93dp"
+        app:srcCompat="@drawable/ghostcontrol"
+        tools:layout_editor_absoluteX="406dp"
+        tools:layout_editor_absoluteY="301dp" />
+
+    <ImageView
+        android:id="@+id/wolf"
+        android:layout_width="128dp"
+        android:layout_height="89dp"
+        app:srcCompat="@drawable/wolfcontrol"
+        tools:layout_editor_absoluteX="222dp"
+        tools:layout_editor_absoluteY="305dp" />
+
+    <ImageView
+        android:id="@+id/rat"
+        android:layout_width="110dp"
+        android:layout_height="57dp"
+        app:srcCompat="@drawable/ratcontrol"
+        tools:layout_editor_absoluteX="69dp"
+        tools:layout_editor_absoluteY="337dp" />
 
     <TextView
-        android:id="@+id/Attack"
+        android:id="@+id/howtoplay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Attack"
-        android:textColor="#000000"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="@+id/imageView11"
-        app:layout_constraintStart_toStartOf="@+id/imageView11"
-        tools:layout_editor_absoluteY="236dp" />
-
-    <Button
-        android:id="@+id/Back"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="Back"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_marginTop="24dp"
+        android:text="How To Play"
+        android:textColor="#0381DB"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="297dp" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/textView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="24dp"
         android:text="Jump"
-        android:textColor="#03A9F4"
+        android:textColor="#2196F3"
         android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/textView5"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="184dp" />
+        app:layout_constraintBottom_toTopOf="@+id/rat"
+        tools:layout_editor_absoluteX="96dp" />
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:text="Attack"
+        android:textColor="#2196F3"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/wolf"
+        tools:layout_editor_absoluteX="255dp" />
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:text="Slide"
+        android:textColor="#2196F3"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/ghost"
+        tools:layout_editor_absoluteX="417dp" />
 
 </android.support.constraint.ConstraintLayout>

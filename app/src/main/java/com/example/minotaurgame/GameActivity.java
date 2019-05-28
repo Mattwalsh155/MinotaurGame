@@ -1,13 +1,21 @@
 package com.example.minotaurgame;
 
-
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.graphics.drawable.AnimationDrawable;
-
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -16,32 +24,122 @@ import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
 import java.util.Random;
-import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
 
+import com.q42.android.scrollingimageview.ScrollingImageView;
 
+import java.io.IOException;
 import java.util.Timer;
+import java.util.TimerTask;
 
-public class GameActivity extends AppCompatActivity implements View.OnClickListener{
+public class GameActivity extends AppCompatActivity implements View.OnClickListener {
+
 
     Button Button1;
     Button Button2;
     Button Button3;
-    AnimationDrawable runningMinotaur;
-    AnimationDrawable attackingMinotaur;
-    AnimationDrawable slidingMinotaur;
-    AnimationDrawable jumpingMinotaur;
-    ImageView minotaurWalk;
-    ImageView minotaurJump;
-    ImageView minotaurAttack;
-    ImageView minotaurSlide;
+    Button pauseButton;
+    //
+    AnimationDrawable minotaurState;
+    AnimationDrawable wolfState;
+    //
+    ImageView minotaurImageView;
+    ImageView wolfImageView;
+    //
+    //positions
+    public int wolfImageViewX;
+    public int wolfImageViewY;
+
+    private int wolfPosX;
+    private int wolfPosY;
+    //
+    TextView scoreText;
+    TextView levelText;
+
+    //
+    int currentScore = 0;
+    int currentLevel = 1;
+    //
+    private int screenWidth;
+    private int screenHeight;
+    //
     private Handler myHandler;
     private int animation = 0;
     private boolean buttonPressed = true;
     private int loopTime = 900;
 
-    private float jumpXVelocity;
+
+    MediaPlayer music;
+
+    private SoundPool soundPool;
+    int jump = -1;
+    int slide = -1;
+    int attack = -1;
+
     private Timer timer = new Timer();
+    private Handler handler = new Handler();
+
+    ScrollingImageView scrollingBackground;
+
+    long startTime = System.currentTimeMillis();
+    long elapsedTime = 0;
+
+    boolean isGameOver = false;
+
+    private boolean isPaused = false;
+
+    Thread ourThread = null;
+    volatile boolean playingGame;
+
+    private boolean running = true;
+
+    SharedPreferences prefs;
+    SharedPreferences.Editor editor;
+    String dataName = "MyData";
+    String intName = "MyInt";
+    int defaultInt = 0;
+    int hiScore;
+
+    public long loopTimer;
+    public long loopTimer2;
+
+    public boolean isOverlapping = false;
+    public boolean isAttacking = false;
+
+    //randomizing enemies
+//    private int x, y;
+//    private int maxX;
+//    private int minX;
+//
+//    private int maxY;
+//    private int minY;
+//
+//    public int getX() {
+//        return x;
+//    }
+//
+//    public int getY() {
+//        return y;
+//    }
+//
+//    public void enemiesSpawn(Context context, int screenX, int screenY) {
+//        maxX = screenX;
+//        maxY = screenY;
+//        minX = 0;
+//        minY = 0;
+//
+//        Random generator = new Random();
+//
+//        x = screenX;
+//        y = generator.nextInt(maxY) - wolfImageView.getHeight();
+//
+//        if (x < minX-wolfImageView.getWidth()) {
+//            x = maxX;
+//            y = generator.nextInt(maxY) - wolfImageView.getHeight();
+//        }
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,105 +148,239 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
+        soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
+        try {
+            AssetManager assetManager = getAssets();
+            AssetFileDescriptor descriptor;
+
+            descriptor = assetManager.openFd("jump.wav");
+            jump = soundPool.load(descriptor, 0);
+
+            descriptor = assetManager.openFd("hit.wav");
+            attack = soundPool.load(descriptor, 0);
+
+            descriptor = assetManager.openFd("slide.wav");
+            slide = soundPool.load(descriptor, 0);
+        } catch (IOException e) {
+        }
+
+        music();
+
         setContentView(R.layout.activity_game);
 
-        minotaurWalk = (ImageView)findViewById(R.id.playerWalkAnim);
-        minotaurWalk.setImageResource(R.drawable.runningminotaur);
-        runningMinotaur = (AnimationDrawable)minotaurWalk.getDrawable();
-        runningMinotaur.start();
+        prefs = getSharedPreferences(dataName, MODE_PRIVATE);
+        editor = prefs.edit();
+        hiScore = prefs.getInt(intName, defaultInt);
 
-        Button1 = (Button)findViewById(R.id.jumpButton);
-        Button2 = (Button)findViewById(R.id.attackButton);
-        Button3 = (Button)findViewById(R.id.slideButton);
+        minotaurImageView = findViewById(R.id.playerWalkAnim);
+        minotaurImageView.setImageResource(R.drawable.runningminotaur);
+        minotaurState = (AnimationDrawable) minotaurImageView.getDrawable();
+        minotaurState.start();
+
+        wolfImageView = findViewById(R.id.enemyAnim);
+        wolfImageView.setImageResource(R.drawable.wolfrun);
+        wolfState = (AnimationDrawable) wolfImageView.getDrawable();
+        wolfState.start();
+        //moveWolf();
+
+        Button1 = findViewById(R.id.jumpButton);
+        Button2 = findViewById(R.id.attackButton);
+        Button3 = findViewById(R.id.slideButton);
+        pauseButton = findViewById(R.id.pauseButton);
 
         Button1.setOnClickListener(this);
         Button2.setOnClickListener(this);
         Button3.setOnClickListener(this);
+        pauseButton.setOnClickListener(this);
+
+        scrollingBackground = findViewById(R.id.scrolling_background);
+        scrollingBackground.setSpeed(3);
+
+        scoreText = findViewById(R.id.scoreText);
+        levelText = findViewById(R.id.levelText);
+
+        loopTimer = System.currentTimeMillis();
+        loopTimer2 = System.currentTimeMillis();
+
+        // Get screen size
+        WindowManager wm = getWindowManager();
+        Display disp = wm.getDefaultDisplay();
+        Point size = new Point();
+        disp.getSize(size);
+        screenWidth = size.x;
+        screenHeight = size.y;
+
+        //move the position
+        wolfPosX = size.x;
+        wolfPosY = size.y;
+        wolfImageView.setX(wolfPosX);
+        wolfImageView.setY(wolfPosY);
+
+         //start the timer
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        changePos();
+                    }
+                });
+            }
+        }, 0, 20);
 
 
-        if(buttonPressed){
-            myHandler = new Handler() {
-                public void handleMessage(Message msg) {
-                    super.handleMessage(msg);
+        //game loop
+        myHandler = new Handler() {
 
-                    switch(animation){
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+
+
+
+                if (!isPaused) {
+
+                    switch (animation) {
                         case 0:
-                            minotaurWalk = (ImageView)findViewById(R.id.playerWalkAnim);
-                            minotaurWalk.setImageResource(R.drawable.runningminotaur);
-                            runningMinotaur = (AnimationDrawable)minotaurWalk.getDrawable();
-                            runningMinotaur.start();
-                            loopTime = 900;
+                            SetAnimation(R.drawable.runningminotaur, 900, false, false);
+                            scrollingBackground.setSpeed(3);
                             break;
 
                         case 1:
-                            minotaurAttack = (ImageView) findViewById(R.id.playerWalkAnim);
-                            minotaurAttack.setImageResource(R.drawable.attackingminotaur);
-                            attackingMinotaur = (AnimationDrawable) minotaurAttack.getDrawable();
-                            attackingMinotaur.start();
-                            loopTime = 1600;
+                            SetAnimation(R.drawable.attackingminotaur, 1600, false, false);
+                            isAttacking = true;
                             break;
 
                         case 2:
-                            minotaurSlide = (ImageView) findViewById(R.id.playerWalkAnim);
-                            minotaurSlide.setImageResource(R.drawable.slidingminotaur);
-                            slidingMinotaur = (AnimationDrawable) minotaurSlide.getDrawable();
-                            slidingMinotaur.start();
-                            loopTime = 600;
+                            SetAnimation(R.drawable.slidingminotaur, 1200, false, false);
+                            scrollingBackground.setSpeed(10);
                             break;
 
                         case 3:
-                            minotaurJump = (ImageView) findViewById(R.id.playerWalkAnim);
-                            minotaurJump.setImageResource(R.drawable.jumpingminotaur);
-                            jumpingMinotaur = (AnimationDrawable) minotaurJump.getDrawable();
-                            jumpingMinotaur.start();
-                            loopTime = 800;
-                            moveAnimationUp();
-                            //moveAnimationDown();
-
+                            SetAnimation(R.drawable.jumpingminotaur, 800, true, false);
                             break;
 
                         case 4:
-                            minotaurJump = (ImageView) findViewById(R.id.playerWalkAnim);
-                            minotaurJump.setImageResource(R.drawable.jumpingminotaur);
-                            jumpingMinotaur = (AnimationDrawable) minotaurJump.getDrawable();
-                            jumpingMinotaur.start();
-                            loopTime = 800;
-                            //moveAnimationUp();
-                            moveAnimationDown();
-
+                            SetAnimation(R.drawable.fallingminotaur, 800, false, true);
                             break;
 
                         default:
-                            minotaurWalk = (ImageView)findViewById(R.id.playerWalkAnim);
-                            minotaurWalk.setImageResource(R.drawable.runningminotaur);
-                            runningMinotaur = (AnimationDrawable)minotaurWalk.getDrawable();
-                            runningMinotaur.start();
-                            loopTime = 900;
+                            SetAnimation(R.drawable.runningminotaur, 900, false, false);
                             break;
 
                     }
 
-                    if(animation == 3){
+                    if (animation == 3) {
                         animation = 4;
                     } else {
                         animation = 0;
                     }
-
-
-                    myHandler.sendEmptyMessageDelayed(0, loopTime);
-                    buttonPressed = false;
                 }
-            };
-            myHandler.sendEmptyMessage(0);
+
+                myHandler.sendEmptyMessageDelayed(0, loopTime);
+                buttonPressed = false;
+                checkCollisions();
+                //wolfPosX-= 100;
+                //wolfImageView.setX(wolfPosX);
+
+            }
+
+        };
+
+
+        myHandler.sendEmptyMessage(0);
+
+    }
+
+    public void changePos() {
+    //move to the left
+        wolfImageViewX -= 10;
+        if (wolfImageView.getX() + wolfImageView.getWidth() <= 0) {
+            wolfImageViewX = screenWidth + 100;
+            wolfImageViewY = screenHeight - 170;
+            isOverlapping = false;
+        }
+        wolfImageView.setX(wolfImageViewX);
+        wolfImageView.setY(wolfImageViewY);
+    }
+
+
+    public void checkCollisions(){
+        Rect rectMinotaur = new Rect();
+        Rect rectWolf = new Rect();
+
+        minotaurImageView.getHitRect(rectMinotaur);
+        wolfImageView.getHitRect(rectWolf);
+
+
+        Log.d("Matt", "minoPosX : " + minotaurImageView.getX());
+        Log.d("Matt", "minoPosY : " + minotaurImageView.getY());
+        Log.d("Matt", "wolfPosX : " + wolfImageView.getX());
+        Log.d("Matt", "wolfPosY : " + wolfImageView.getY());
+
+        if(Rect.intersects(rectMinotaur,rectWolf)&& isAttacking){
+            wolfDeath();
+
+        } else {
+            if (Rect.intersects(rectMinotaur, rectWolf)) {
+                //soundPool.play(jump,1,1,0,0,1);
+                SetAnimation(R.drawable.dyingminotaur, 1100, false, false);
+                scrollingBackground.setSpeed(0);
+                isOverlapping = true;
+                gameOver();
+                isGameOver = true;
+
+            }
         }
     }
+    public void wolfDeath(){
+        isAttacking = false;
+        isOverlapping = false;
+        wolfImageViewX = screenWidth + 100;
+        wolfImageViewY = screenHeight - 170;
+        wolfImageView.setX(wolfImageViewX);
+        wolfImageView.setY(wolfImageViewY);
+        isOverlapping = false;
+        wolfImageView = findViewById(R.id.enemyAnim);
+
+        updateScore();
+
+    }
+
+    public void SetAnimation(int id, int lt, boolean goUp, boolean goDown) {
+        minotaurImageView = findViewById(R.id.playerWalkAnim);
+        minotaurImageView.setImageResource(id);
+        minotaurState = (AnimationDrawable) minotaurImageView.getDrawable();
+        minotaurState.start();
+        loopTime = lt;
+
+        if (goUp) {
+            moveAnimationUp();
+        }
+
+        if (goDown) {
+            moveAnimationDown();
+        }
+    }
+
+    public void music(){
+        if(music == null){
+            music = MediaPlayer.create(this,R.raw.soundtrack);
+            if(music != null){
+                music = MediaPlayer.create(this,R.raw.soundtrack2);
+                music.setLooping(true);
+            }
+        }
+        music.start();
+    }
+
+
 
     public void moveAnimationUp() {
         Animation img = new TranslateAnimation(Animation.ABSOLUTE, Animation.ABSOLUTE, 0, -300);
         img.setDuration(800);
 
-
-        minotaurJump.startAnimation(img);
+        minotaurImageView.startAnimation(img);
         //myHandler.sendEmptyMessageDelayed(0, 800);
         //moveAnimationDown();
     }
@@ -157,8 +389,37 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         Animation img = new TranslateAnimation(Animation.ABSOLUTE, Animation.ABSOLUTE, -300, 0);
         img.setDuration(800);
 
+        minotaurImageView.startAnimation(img);
+    }
 
-        minotaurJump.startAnimation(img);
+    //This method is no longer needed. Don't think it's doing anything?
+    public void moveWolf() {
+        Animation img = new TranslateAnimation(Animation.ABSOLUTE, Animation.ABSOLUTE ,Animation.ABSOLUTE, Animation.ABSOLUTE);
+        img.setDuration(5000);
+        img.setRepeatCount(-1);
+
+
+        wolfImageView.startAnimation(img);
+    }
+
+    public void gameOver() {
+        if (isGameOver) {
+            //gameOverText.setVisibility(View.VISIBLE);
+            Intent intent = new Intent(this, gameOver.class);
+            startActivity(intent);
+
+            finish();
+
+            //update the high score
+            if (currentScore > hiScore) {
+                hiScore = currentScore;
+                editor.putInt(intName, hiScore);
+                editor.commit();
+                Toast.makeText(getApplicationContext(), "New High Score!",
+                        Toast.LENGTH_LONG).show();
+            }
+            running = false;
+        }
     }
 
     @Override
@@ -167,41 +428,117 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
         switch (v.getId()) {
             case R.id.attackButton:
-//                ImageView minotaurAttack = (ImageView) findViewById(R.id.playerWalkAnim);
-//                minotaurAttack.setImageResource(R.drawable.attackingminotaur);
-//                attackingMinotaur = (AnimationDrawable) minotaurAttack.getDrawable();
-//                attackingMinotaur.start();
+//
                 buttonPressed = true;
                 animation = 1;
+
+                soundPool.play(attack, 1, 1, 0, 0, 1);
+
+
                 break;
 
             case R.id.jumpButton:
                 buttonPressed = true;
                 animation = 3;
+
+                soundPool.play(jump, 1, 1, 0, 0, 1);
                 //moveAnimation();
+
 
                 break;
 
             case R.id.slideButton:
-//                ImageView minotaurSlide = (ImageView) findViewById(R.id.playerWalkAnim);
-//                minotaurSlide.setImageResource(R.drawable.slidingminotaur);
-//                slidingMinotaur = (AnimationDrawable) minotaurSlide.getDrawable();
-//                slidingMinotaur.start();
+
+
+//
                 animation = 2;
+
                 buttonPressed = true;
+                animation = 2;
+                soundPool.play(slide, 1, 1, 0, 0, 1);
+
+
+                break;
+
+            case R.id.pauseButton:
+                if (isPaused) {
+                    minotaurState.start();
+                    scrollingBackground.start();
+                    wolfState.start();
+                    // *** Use "minotaurImageView" and try to stop the animation
+
+                    isPaused = false;
+
+                    pauseButton.setText("Pause");
+                    Button1.setEnabled(true);
+                    Button2.setEnabled(true);
+                    Button3.setEnabled(true);
+                } else {
+                    minotaurState.stop();
+                    scrollingBackground.stop();
+                    wolfState.stop();
+
+                    isPaused = true;
+
+                    pauseButton.setText("Resume");
+                    Button1.setEnabled(false);
+                    Button2.setEnabled(false);
+                    Button3.setEnabled(false);
+                }
 
                 break;
 
             default:
-//                ImageView minotaurWalk = (ImageView)findViewById(R.id.playerWalkAnim);
-//                minotaurWalk.setImageResource(R.drawable.runningminotaur);
-//                runningMinotaur = (AnimationDrawable)minotaurWalk.getDrawable();
-//                runningMinotaur.start();
                 animation = 0;
                 buttonPressed = true;
-
+                //scrollingBackground.setSpeed(3);
                 break;
         }
+
+    }
+
+    void updateScore() {
+
+        currentScore = (currentScore + 10);
+
+        scoreText.setText("Score: " + currentScore);
+    }
+
+    void updateLevel() {
+        if (elapsedTime >= 10000) {
+            currentLevel++;
+        }
+        levelText.setText("Level: " + currentLevel);
+
+    }
+
+    public void pause() {
+        playingGame = false;
+        try {
+            ourThread.join();
+        } catch (InterruptedException e) {
+
+        }
+    }
+
+    public void resume() {
+        playingGame = true;
+        ourThread = new Thread((Runnable) this);
+        ourThread.start();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        //R.layout.activity_game.pause();
+        elapsedTime = elapsedTime + (System.currentTimeMillis() - startTime);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //gameView.resume();
+        startTime = (System.currentTimeMillis());
 
     }
 
@@ -250,3 +587,4 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
     }
 }
+
