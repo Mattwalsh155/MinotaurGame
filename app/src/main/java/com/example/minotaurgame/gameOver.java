@@ -1,10 +1,12 @@
 package com.example.minotaurgame;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 
 public class gameOver extends AppCompatActivity implements View.OnClickListener {
 
@@ -15,11 +17,19 @@ public class gameOver extends AppCompatActivity implements View.OnClickListener 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_game_over);
+
+        Button menuButton = findViewById(R.id.homeButton);
+
+        menuButton.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
+        Intent i;
+        i = new Intent(this, MainActivity.class);
+        startActivity(i);
 
+        finish();
     }
 
     @Override

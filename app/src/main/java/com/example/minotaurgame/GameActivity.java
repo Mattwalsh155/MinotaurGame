@@ -4,8 +4,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
-import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.AnimationDrawable;
@@ -18,7 +16,6 @@ import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Display;
-import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -36,11 +33,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class GameActivity extends AppCompatActivity implements View.OnClickListener {
-
-    //I'm not sure about making a constructor?
-//    public GameActivity(Context context) {
-//        super(context);
-//    }
 
 
     Button Button1;
@@ -63,7 +55,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     //
     TextView scoreText;
     TextView levelText;
-    TextView gameOverText;
 
     //
     int currentScore = 0;
@@ -85,8 +76,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     int slide = -1;
     int attack = -1;
 
-    private float jumpXVelocity;
-
     private Timer timer = new Timer();
     private Handler handler = new Handler();
 
@@ -102,8 +91,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     Thread ourThread = null;
     volatile boolean playingGame;
 
-    private Rect rectPlayer;
-
     private boolean running = true;
 
     SharedPreferences prefs;
@@ -113,16 +100,11 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     int defaultInt = 0;
     int hiScore;
 
-    //Stuff to add a canvas... I don't think we need this
-    private Paint paint;
-    private Canvas canvas;
-    private SurfaceHolder ourHolder;
     public long loopTimer;
     public long loopTimer2;
 
     public boolean isOverlapping = false;
     public boolean isAttacking = false;
-    public int enemiesKilled = 0;
 
     //randomizing enemies
 //    private int x, y;
@@ -211,12 +193,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
         scrollingBackground = findViewById(R.id.scrolling_background);
         scrollingBackground.setSpeed(3);
-        //int enemiesKilled = 0;
 
         scoreText = findViewById(R.id.scoreText);
         levelText = findViewById(R.id.levelText);
-        //gameOverText = findViewById(R.id.gameOverText);
-        //gameOverText.setVisibility(View.INVISIBLE);
 
         loopTimer = System.currentTimeMillis();
         loopTimer2 = System.currentTimeMillis();
@@ -248,27 +227,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
             }
         }, 0, 20);
 
-
-        //trying to set the location of the rect to be where our imageview is for the player
-        //rectPlayer.set();
-//        Rect recMinotaur = new Rect();
-//        minotaurImageView.getDrawingRect(recMinotaur);
-//
-//        Rect recWolf = new Rect();
-//        wolfImageView.getDrawingRect(recWolf);
-
-
-
-
-
-
-
-
-
-//        if(Rect.intersects(recMinotaur, recWolf)){
-//            //Kill the player.
-//            soundPool.play(jump,1,1,0,0,1);
-//        }
 
         //game loop
         myHandler = new Handler() {
@@ -328,23 +286,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         };
 
 
-
-
-
-//            loopTimer2 = System.currentTimeMillis();
-//            if(loopTimer2 >= loopTimer + 100){
-//                loopTimer = System.currentTimeMillis();
-//
-//                gameOver();
-//                myHandler.sendEmptyMessageDelayed(0, 100);
-//            }
-            //updateScore(enemiesKilled);
-            //updateLevel();
-
-
-        //I'm not sure where to put this to make it work
-
-
         myHandler.sendEmptyMessage(0);
 
     }
@@ -366,12 +307,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         Rect rectMinotaur = new Rect();
         Rect rectWolf = new Rect();
 
-        //minotaurImageView.getX();
-        //wolfImageView.getDrawable().copyBounds();
-        //minotaurImageView.getDrawingRect(rectMinotaur);
-        //wolfImageView.getDrawingRect(rectWolf);
-        //minotaurImageView.getDrawable().copyBounds();
-        //wolfImageView.getDrawable().copyBounds();
         minotaurImageView.getHitRect(rectMinotaur);
         wolfImageView.getHitRect(rectWolf);
 
@@ -397,8 +332,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
     public void wolfDeath(){
-        //SetAnimation(R.drawable.attackingminotaur,1100,false,false);
-        //scrollingBackground.setSpeed(0);
         isAttacking = false;
         isOverlapping = false;
         wolfImageViewX = screenWidth + 100;
@@ -406,13 +339,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         wolfImageView.setX(wolfImageViewX);
         wolfImageView.setY(wolfImageViewY);
         isOverlapping = false;
-//        wolfImageView = findViewById(R.id.enemyAnim);
-//        wolfImageView.setImageResource(R.drawable.wolfdeath);
-//        wolfState = (AnimationDrawable) wolfImageView.getDrawable();
-//        wolfState.start();
+        wolfImageView = findViewById(R.id.enemyAnim);
 
-        //currentScore ++;
-        //enemiesKilled ++;
         updateScore();
 
     }
@@ -446,13 +374,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
 
 
-
-
-    public void time(){
-
-    }
-
-
     public void moveAnimationUp() {
         Animation img = new TranslateAnimation(Animation.ABSOLUTE, Animation.ABSOLUTE, 0, -300);
         img.setDuration(800);
@@ -478,12 +399,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
         wolfImageView.startAnimation(img);
     }
-
-//    public boolean checkCollision(View playerWalkAnim, View enemyAnim) {
-//        Rect playerRect = new Rect(playerWalkAnim.getLeft(), playerWalkAnim.getTop(), playerWalkAnim.getRight(), playerWalkAnim.getBottom());
-//        Rect enemyRect = new Rect(enemyAnim.getLeft(), enemyAnim.getTop(), enemyAnim.getRight(), enemyAnim.getBottom());
-//        return playerRect.intersect(enemyRect);
-//    }
 
     public void gameOver() {
         if (isGameOver) {
@@ -532,10 +447,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
             case R.id.slideButton:
 
-//                ImageView minotaurSlide = (ImageView) findViewById(R.id.playerWalkAnim);
-//                minotaurSlide.setImageResource(R.drawable.slidingminotaur);
-//                slidingMinotaur = (AnimationDrawable) minotaurSlide.getDrawable();
-//                slidingMinotaur.start();
 
 //
                 animation = 2;
