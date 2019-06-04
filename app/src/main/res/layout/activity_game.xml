@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:scrolling_image_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/frameLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 
@@ -124,5 +125,5 @@
      scrolling_image_view:srcCompat="@drawable/wolf_run_01" /> -->
 
 
-
 </android.support.constraint.ConstraintLayout>
+
