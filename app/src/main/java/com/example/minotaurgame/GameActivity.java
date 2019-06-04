@@ -298,7 +298,7 @@ public Bitmap bitmap;
                             break;
 
                         case 1:
-                            SetAnimation(R.drawable.attackingminotaur, 1600, false, false);
+                            SetAnimation(R.drawable.attackingminotaur, 2000, false, false);
                             isAttacking = true;
                             break;
 
@@ -308,7 +308,8 @@ public Bitmap bitmap;
                             break;
 
                         case 3:
-                            SetAnimation(R.drawable.jumpingminotaur, 800, true, false);
+                            SetAnimation(R.drawable.jumpingminotaur, 1200, true, false);
+                            scrollingBackground.setSpeed(8);
                             break;
 
                         case 4:
