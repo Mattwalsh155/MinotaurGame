@@ -1,9 +1,16 @@
 package com.example.minotaurgame;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.os.Bundle;
+import android.view.MotionEvent;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -42,9 +49,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
         //displays the High score
         hiScoreText.setText("High Score:" + hiScore);
 
-        Button playButton = (Button)findViewById(R.id.playButton);
+        Button playButton = (Button) findViewById(R.id.playButton);
 
-        minotaurAnimView = new MinotaurAnimView(this);
+        MinotaurAnimView minotaurAnimView = new MinotaurAnimView(this);
 
         setContentView(minotaurAnimView);
         setContentView(R.layout.activity_game);
@@ -62,6 +69,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
             super(context);
             ourHolder = getHolder();
             paint = new Paint();
+            ImageView playerWalkAnimBitmap;
+            int frameWidth;
+            int frameHeight;
+            int numFrames;
+
+            playerWalkAnimBitmap = findViewById(R.id.playerWalkAnim);
             frameWidth = playerWalkAnimBitmap.getWidth() / numFrames;
             frameHeight = playerWalkAnimBitmap.getHeight();
         }
